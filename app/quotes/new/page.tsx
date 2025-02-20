@@ -1,5 +1,5 @@
 "use client";
-import AddProduct from "@/components/AddProduct";
+import AddProductSearch from "@/components/AddProductSearch";
 import ManualProductAdd from "@/components/ManualProductAdd";
 import { useState } from "react";
 export default function NewQuote() {
@@ -134,7 +134,7 @@ export function QuoteTable() {
           </div>
         </div>
       </div>
-      <AddProduct open={open} setOpen={setOpen} />
+      <AddProductSearch open={open} setOpen={setOpen} />
     </div>
   );
 }
