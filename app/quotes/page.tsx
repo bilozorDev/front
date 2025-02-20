@@ -78,7 +78,7 @@ const projects = [
   },
 ];
 
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
@@ -97,7 +97,7 @@ export function QuotesList() {
               </p>
               <p
                 className={classNames(
-                  statuses[project.status],
+                  statuses[project.status as keyof typeof statuses],
                   "mt-0.5 rounded-md px-1.5 py-0.5 text-xs font-medium whitespace-nowrap ring-1 ring-inset"
                 )}
               >
