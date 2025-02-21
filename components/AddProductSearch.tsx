@@ -95,43 +95,7 @@ export default function AddProductSearch({
                 </div>
 
                 {isLoading ? (
-                  <div className="flex flex-row">
-                    <div className="flex transform-gpu divide-x divide-gray-100 w-full">
-                      <div className="max-h-96 min-w-0 flex-auto scroll-py-4 overflow-y-auto px-6 py-4">
-                        <h2 className="mb-4 mt-2 text-xs font-semibold text-gray-500">
-                          Recent searches
-                        </h2>
-                        <div className="-mx-2 text-sm text-gray-700">
-                          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
-                            <div
-                              key={index}
-                              className="group flex cursor-default select-none items-center rounded-md p-2 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                            >
-                              <span className="ml-3 h-8 w-full bg-gray-200 animate-pulse flex "></span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="hidden border-l border-gray-100 w-1/2 flex-none flex-col divide-y divide-gray-100 overflow-y-auto sm:flex">
-                      <div className="flex-none p-6 text-center">
-                        <div className="mx-auto h-48 w-48 bg-gray-100 animate-pulse" />
-                        <h2 className="mt-3 font-semibold text-gray-900 h-5 w-full bg-gray-100 animate-pulse"></h2>
-                        <p className="text-sm/6 bg-gray-100 animate-pulse h-6 mt-2"></p>
-                      </div>
-                      <div className="flex flex-auto flex-col justify-between p-6">
-                        <div className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm text-gray-700">
-                          {[1, 2].map((index) => (
-                            <p
-                              key={index}
-                              className="text-sm/6 bg-gray-100 animate-pulse h-6 mt-2"
-                            ></p>
-                          ))}
-                        </div>
-                        <div className="mt-6 w-full rounded-md bg-indigo-200 animate-pulse px-3 py-2 h-12 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"></div>
-                      </div>
-                    </div>
-                  </div>
+                  <LoadingProductSkeleton />
                 ) : (
                   (query === "" || (data && data.length > 0)) && (
                     <ComboboxOptions
@@ -159,11 +123,6 @@ export default function AddProductSearch({
                               value={product}
                               className="group flex cursor-default select-none items-center rounded-md p-2 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
                             >
-                              <img
-                                src={product.image_url ?? ""}
-                                alt=""
-                                className="size-6 flex-none rounded-full"
-                              />
                               <span className="ml-3 flex-auto truncate">
                                 {product.name}
                               </span>
@@ -289,3 +248,45 @@ export default function AddProductSearch({
     </Dialog>
   );
 }
+
+const LoadingProductSkeleton = () => {
+  return (
+    <div className="flex flex-row">
+      <div className="flex transform-gpu divide-x divide-gray-100 w-full">
+        <div className="max-h-96 min-w-0 flex-auto scroll-py-4 overflow-y-auto px-6 py-4">
+          <h2 className="mb-4 mt-2 text-xs font-semibold text-gray-500">
+            Recent searches
+          </h2>
+          <div className="-mx-2 text-sm text-gray-700">
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+              <div
+                key={index}
+                className="group flex cursor-default select-none items-center rounded-md p-2 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
+              >
+                <span className="ml-3 h-8 w-full bg-gray-200 animate-pulse flex "></span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="hidden border-l border-gray-100 w-1/2 flex-none flex-col divide-y divide-gray-100 overflow-y-auto sm:flex">
+        <div className="flex-none p-6 text-center">
+          <div className="mx-auto h-48 w-48 bg-gray-100 animate-pulse" />
+          <h2 className="mt-3 font-semibold text-gray-900 h-5 w-full bg-gray-100 animate-pulse"></h2>
+          <p className="text-sm/6 bg-gray-100 animate-pulse h-6 mt-2"></p>
+        </div>
+        <div className="flex flex-auto flex-col justify-between p-6">
+          <div className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm text-gray-700">
+            {[1, 2].map((index) => (
+              <p
+                key={index}
+                className="text-sm/6 bg-gray-100 animate-pulse h-6 mt-2"
+              ></p>
+            ))}
+          </div>
+          <div className="mt-6 w-full rounded-md bg-indigo-200 animate-pulse px-3 py-2 h-12 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"></div>
+        </div>
+      </div>
+    </div>
+  );
+};
