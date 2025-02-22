@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
+import Hydration from "@/utils/hydration";
 import Layout from "@/components/Layout";
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,6 +28,7 @@ export default function RootLayout({
         <QueryClientProvider client={queryClient}>
           <Layout>{children}</Layout>
           <ReactQueryDevtools initialIsOpen={false} />
+          <Hydration />
         </QueryClientProvider>
       </body>
     </html>

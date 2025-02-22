@@ -20,7 +20,7 @@ import { formatPrice } from "@/utils/formatPrice";
 import { useFuzzyProductSearch } from "@/queries/fuzzyProductSearch";
 import { Product } from "@/types/types.t";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
-
+import useQuoteStore from "@/store/quote-store";
 const recent: Product[] = [];
 
 function classNames(...classes: string[]) {
@@ -56,6 +56,8 @@ export default function AddProductSearch({
       pathname + "?" + createQueryString("addProductManually", "true")
     );
   }, [setOpen, router, pathname, createQueryString]);
+
+  const { addProduct, removeProduct } = useQuoteStore();
 
   return (
     <Dialog
@@ -186,6 +188,9 @@ export default function AddProductSearch({
                               <button
                                 type="button"
                                 className="mt-6 w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                onClick={() =>
+                                  addProduct(activeOption as Product)
+                                }
                               >
                                 Add product
                               </button>
