@@ -1,6 +1,7 @@
 export function formatPrice(price: number) {
-  return price.toLocaleString("en-US", {
+  const formatted = price.toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
   });
+  return formatted;
 }

@@ -2,10 +2,22 @@ import useQuoteStore from "@/store/quote-store";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import AddProductSearch from "./AddProductSearch";
+import { formatPrice } from "@/utils/formatPrice";
+import { MinusIcon, PlusIcon } from "@heroicons/react/16/solid";
+
+function calculateTotalForProduct(
+  price: number,
+  quantity: number,
+  margin: number
+) {
+  return price * margin * quantity;
+}
 
 function QuoteTable() {
   const [open, setOpen] = useState(false);
-  const { quote } = useQuoteStore();
+  const { quote, removeProduct, increaseQuantity, decreaseQuantity } =
+    useQuoteStore();
+
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
@@ -46,34 +58,33 @@ function QuoteTable() {
                   </th>
                   <th
                     scope="col"
-                    className="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    className="whitespace-nowrap px-2 py-3.5 text-right text-sm font-semibold text-gray-900 w-32"
                   >
                     Cost
                   </th>
                   <th
                     scope="col"
-                    className="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    className="whitespace-nowrap px-2 py-3.5 text-right text-sm font-semibold text-gray-900 w-24"
                   >
                     Margin
                   </th>
                   <th
                     scope="col"
-                    className="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    className="whitespace-nowrap px-2 py-3.5 text-center text-sm font-semibold text-gray-900 w-32"
                   >
                     Quantity
                   </th>
                   <th
                     scope="col"
-                    className="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    className="whitespace-nowrap px-2 py-3.5 text-right text-sm font-semibold text-gray-900 w-32"
                   >
                     Total
                   </th>
-
                   <th
                     scope="col"
-                    className="relative whitespace-nowrap py-3.5 pl-3 pr-4 sm:pr-0"
+                    className="relative whitespace-nowrap py-3.5 pl-3 pr-4 sm:pr-0 w-24"
                   >
-                    <span className="sr-only">Edit</span>
+                    <span className="sr-only">remove</span>
                   </th>
                 </tr>
               </thead>
@@ -87,26 +98,52 @@ function QuoteTable() {
                       >
                         {product.name}
                       </td>
-                      <td className="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">
-                        {product.price}
+                      <td className="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900 text-right font-mono tabular-nums">
+                        {formatPrice(product.price)}
                       </td>
-                      <td className="whitespace-nowrap px-2 py-2 text-sm text-gray-900">
-                        {product.price}
+                      <td className="whitespace-nowrap px-2 py-2 text-sm text-gray-900 text-right font-mono tabular-nums">
+                        {((quote.markup - 1) * 100).toFixed(0)}%
                       </td>
-                      <td className="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
-                        {product.price}
+                      <td className="whitespace-nowrap select-none px-2 py-2 text-sm flex items-center justify-center gap-2 text-gray-500">
+                        <button
+                          onClick={() => decreaseQuantity(product)}
+                          className={`w-4 h-4 cursor-pointer hover:text-red-600 ${
+                            product.quantity === 1 ? "cursor-not-allowed" : ""
+                          }`}
+                        >
+                          <MinusIcon />
+                        </button>
+                        <span className="w-6 text-center font-mono tabular-nums">
+                          {product.quantity}
+                        </span>
+                        <button
+                          onClick={() => increaseQuantity(product)}
+                          className="w-4 h-4 cursor-pointer hover:text-green-600"
+                        >
+                          <PlusIcon />
+                        </button>
                       </td>
-                      <td className="whitespace-nowrap px-2 py-2 text-sm text-gray-500">
-                        {product.quantity}
+                      <td className="whitespace-nowrap px-2 py-2 text-sm text-gray-500 text-right font-mono tabular-nums">
+                        {formatPrice(
+                          calculateTotalForProduct(
+                            product.price,
+                            product.quantity,
+                            quote.markup
+                          )
+                        )}
                       </td>
                       <td className="relative whitespace-nowrap py-2 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                        <button className="text-indigo-600 hover:text-indigo-900">
-                          Edit<span className="sr-only">, {product.id}</span>
+                        <button
+                          className="text-indigo-600 hover:text-indigo-900"
+                          onClick={() => removeProduct(product)}
+                        >
+                          Remove
                         </button>
                       </td>
                     </tr>
                   ))}
               </tbody>
+              {quote.products.length > 0 && <QuoteTotal />}
             </table>
           </div>
         </div>
@@ -115,6 +152,59 @@ function QuoteTable() {
     </div>
   );
 }
-// Disable SSR for this component to prevent hydration errors
+
+function QuoteTotal() {
+  const { quote } = useQuoteStore();
+  const subtotal = quote.products.reduce(
+    (acc, product) => acc + product.price * product.quantity,
+    0
+  );
+  const totalMargin = quote.products.reduce(
+    (acc, product) =>
+      acc + (product.price * quote.markup - product.price) * product.quantity,
+    0
+  );
+
+  return (
+    <tfoot>
+      <tr>
+        <th
+          scope="row"
+          colSpan={6}
+          className="hidden pl-4 pr-3 pt-6 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0"
+        >
+          Subtotal
+        </th>
+        <td className="pl-3 pr-4 pt-6 text-right text-sm text-gray-500 sm:pr-0 font-mono tabular-nums">
+          {formatPrice(subtotal)}
+        </td>
+      </tr>
+      <tr>
+        <th
+          scope="row"
+          colSpan={6}
+          className="hidden pl-4 pr-3 pt-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0"
+        >
+          Margin
+        </th>
+        <td className="pl-3 pr-4 pt-4 text-right text-sm text-gray-500 sm:pr-0 font-mono tabular-nums">
+          {formatPrice(totalMargin)}
+        </td>
+      </tr>
+      <tr>
+        <th
+          scope="row"
+          colSpan={6}
+          className="hidden pl-4 pr-3 pt-4 text-right text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0"
+        >
+          Total
+        </th>
+        <td className="pl-3 pr-4 pt-4 text-right text-sm font-semibold text-gray-900 sm:pr-0 font-mono tabular-nums">
+          {formatPrice(subtotal + totalMargin)}
+        </td>
+      </tr>
+    </tfoot>
+  );
+}
 
 export default dynamic(() => Promise.resolve(QuoteTable), { ssr: false });

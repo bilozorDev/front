@@ -57,7 +57,7 @@ export default function AddProductSearch({
     );
   }, [setOpen, router, pathname, createQueryString]);
 
-  const { addProduct, removeProduct } = useQuoteStore();
+  const { addProduct, removeProduct, quote } = useQuoteStore();
 
   return (
     <Dialog
@@ -189,7 +189,13 @@ export default function AddProductSearch({
                                 type="button"
                                 className="mt-6 w-full rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                 onClick={() =>
-                                  addProduct(activeOption as Product)
+                                  addProduct({
+                                    ...(activeOption as Product),
+                                    quantity: 1,
+                                    total:
+                                      (activeOption as Product).price *
+                                      quote.markup,
+                                  })
                                 }
                               >
                                 Add product
