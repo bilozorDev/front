@@ -17,7 +17,7 @@ interface QuoteProduct {
   quantity: number;
   total: number;
 }
-interface Quote {
+export interface Quote {
   markup: number;
   products: QuoteProduct[];
 }

@@ -126,6 +126,24 @@ export type Database = {
           },
         ]
       }
+      quotes: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       vendors: {
         Row: {
           created_at: string
@@ -152,27 +170,90 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      search_products_by_name_prefix: {
+      gtrgm_compress: {
         Args: {
-          prefix: string
+          "": unknown
         }
-        Returns: {
-          availability: string | null
-          category_id: string | null
-          created_at: string
-          description: string | null
-          id: string
-          image_url: string | null
-          image_urls: string[] | null
-          last_updated: string
-          model: string | null
-          name: string
-          price: number | null
-          product_url: string | null
-          specs: Json | null
-          specs_image_url: string | null
-          vendor_id: string | null
-        }[]
+        Returns: unknown
+      }
+      gtrgm_decompress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gtrgm_in: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gtrgm_options: {
+        Args: {
+          "": unknown
+        }
+        Returns: undefined
+      }
+      gtrgm_out: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      requesting_user_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      search_products_by_name_prefix:
+        | {
+            Args: {
+              prefix: string
+            }
+            Returns: {
+              availability: string | null
+              category_id: string | null
+              created_at: string
+              description: string | null
+              id: string
+              image_url: string | null
+              image_urls: string[] | null
+              last_updated: string
+              model: string | null
+              name: string
+              price: number | null
+              product_url: string | null
+              specs: Json | null
+              specs_image_url: string | null
+              vendor_id: string | null
+            }[]
+          }
+        | {
+            Args: {
+              search_term: string
+              similarity_threshold?: number
+            }
+            Returns: {
+              id: string
+              name: string
+              price: number
+              similarity: number
+            }[]
+          }
+      set_limit: {
+        Args: {
+          "": number
+        }
+        Returns: number
+      }
+      show_limit: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      show_trgm: {
+        Args: {
+          "": string
+        }
+        Returns: string[]
       }
     }
     Enums: {
