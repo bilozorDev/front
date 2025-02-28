@@ -26,19 +26,30 @@ import {
   ChevronDownIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
-import { redirect, usePathname } from "next/navigation";
-import { useUser, SignOutButton } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
+import { useUser, SignOutButton, useClerk } from "@clerk/nextjs";
+import Link from "next/link";
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 const navigation = [
-  { name: "Dashboard", href: "/", icon: HomeIcon, current: true },
-  { name: "Quotes", href: "/quotes", icon: UsersIcon, current: false },
-  { name: "Inventory", href: "/inventory", icon: FolderIcon, current: false },
-  { name: "Clients", href: "/clients", icon: UsersIcon, current: false },
+  { name: "Dashboard", href: "/dashboard", icon: HomeIcon, current: true },
+  { name: "Quotes", href: "dashboard/quotes", icon: UsersIcon, current: false },
+  {
+    name: "Inventory",
+    href: "dashboard/inventory",
+    icon: FolderIcon,
+    current: false,
+  },
+  {
+    name: "Clients",
+    href: "dashboard/clients",
+    icon: UsersIcon,
+    current: false,
+  },
   {
     name: "Settings",
-    href: "/settings",
+    href: "dashboard/settings",
     icon: DocumentDuplicateIcon,
     current: false,
   },
@@ -57,11 +68,10 @@ const userNavigation = [
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const { user } = useUser();
+  const { signOut } = useClerk();
 
   return (
     <div className="relative">
-      
       <div>
         <Dialog
           open={sidebarOpen}
@@ -184,7 +194,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </Dialog>
 
         {/* Static sidebar for desktop */}
-      
 
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
@@ -347,17 +356,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     transition
                     className="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 ring-1 shadow-lg ring-gray-900/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
                   >
-                    {userNavigation.map((item) => (
-                      <MenuItem key={item.name}>
-                        <a
-                          href={item.href}
-                          className="block px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden"
-                        >
-                          {item.name}
-                        </a>
-                      </MenuItem>
-                    ))}
-                    <SignOutButton />
+                    <MenuItem>
+                      <Link
+                        href="/dashboard/settings"
+                        className="block px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden hover:underline"
+                      >
+                        Settings
+                      </Link>
+                    </MenuItem>
+                    <MenuItem>
+                      <button
+                        onClick={() => signOut()}
+                        className="block px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden hover:underline"
+                      >
+                        Sign out
+                      </button>
+                    </MenuItem>
                   </MenuItems>
                 </Menu>
               </div>
