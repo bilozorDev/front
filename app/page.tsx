@@ -1,8 +1,11 @@
-import { createClient } from "@/utils/supabase/server";
+"use client";
+import { SignIn, useUser } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 
-export default async function Home() {
-  const supabase = await createClient();
-  const { data: products } = await supabase.from("products").select();
-
-  return <pre>{JSON.stringify(products, null, 2)}</pre>;
+export default function Home() {
+  const user = useUser();
+  if (user) {
+    return redirect("/dashboard");
+  }
+  return <SignIn />;
 }

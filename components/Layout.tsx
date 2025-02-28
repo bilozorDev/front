@@ -14,7 +14,6 @@ import {
 import {
   Bars3Icon,
   BellIcon,
-  CalendarIcon,
   ChartPieIcon,
   Cog6ToothIcon,
   DocumentDuplicateIcon,
@@ -27,7 +26,8 @@ import {
   ChevronDownIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
+import { useUser, SignOutButton } from "@clerk/nextjs";
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
@@ -57,8 +57,11 @@ const userNavigation = [
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const { user } = useUser();
+
   return (
-    <>
+    <div className="relative">
+      
       <div>
         <Dialog
           open={sidebarOpen}
@@ -99,8 +102,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     className="h-8 w-auto"
                   />
                 </div>
-                <nav className="flex flex-1 flex-col">
-                  <ul role="list" className="flex flex-1 flex-col gap-y-7">
+                <nav className="flex flex-1 flex-col ">
+                  <ul role="list" className="flex flex-1 flex-col gap-y-7 ">
                     <li>
                       <ul role="list" className="-mx-2 space-y-1">
                         {navigation.map((item) => (
@@ -109,7 +112,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                               href={item.href}
                               className={classNames(
                                 item.href === pathname
-                                  ? "bg-gray-50 text-indigo-600"
+                                  ? "bg-gray-50 text-indigo-600 "
                                   : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
                                 "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
                               )}
@@ -181,6 +184,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </Dialog>
 
         {/* Static sidebar for desktop */}
+      
+
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
@@ -191,7 +196,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 className="h-8 w-auto"
               />
             </div>
-            <nav className="flex flex-1 flex-col">
+            <nav className="flex flex-1 flex-col ">
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
                 <li>
                   <ul role="list" className="-mx-2 space-y-1">
@@ -352,6 +357,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         </a>
                       </MenuItem>
                     ))}
+                    <SignOutButton />
                   </MenuItems>
                 </Menu>
               </div>
@@ -363,6 +369,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </main>
         </div>
       </div>
-    </>
+    </div>
   );
 }

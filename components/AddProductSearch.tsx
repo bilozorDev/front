@@ -57,7 +57,7 @@ export default function AddProductSearch({
     );
   }, [setOpen, router, pathname, createQueryString]);
 
-  const { addProduct, removeProduct, quote } = useQuoteStore();
+  const { addProduct, quote } = useQuoteStore();
 
   return (
     <Dialog
@@ -239,8 +239,8 @@ export default function AddProductSearch({
                       No products found
                     </p>
                     <p className="mt-2 text-gray-500">
-                      We couldn't find anything with that term. Please try again
-                      or add the product manually.
+                      We couldn&apos;t find anything with that term. Please try
+                      again or add the product manually.
                     </p>
                     <button
                       type="button"

@@ -86,7 +86,7 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export function QuotesList() {
+function QuotesList() {
   return (
     <>
       <ul role="list" className="divide-y divide-gray-100">
