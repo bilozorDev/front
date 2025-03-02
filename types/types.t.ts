@@ -1,4 +1,11 @@
 // types.ts
+import { Tables, TablesInsert, TablesUpdate } from "./supabase";
+
+// Client types
+export type Client = Tables<"clients">;
+export type ClientInsert = TablesInsert<"clients">;
+export type ClientUpdate = TablesUpdate<"clients">;
+
 export interface Product {
   id: string;
   vendor_id: string;
