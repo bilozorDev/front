@@ -1,29 +1,39 @@
-import { useSession } from "@clerk/nextjs";
-import { createClient } from "@supabase/supabase-js";
+import { useSession, useUser } from '@clerk/nextjs'
+import { createClient } from '@supabase/supabase-js'
 
-// Change to useCreateClerkSupabaseClient to follow hook naming convention
-export function useCreateClerkSupabaseClient() {
-  const { session } = useSession();
+export default function Home() {
+  // The `useSession()` hook will be used to get the Clerk `session` object
+  const { session } = useSession()
 
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      global: {
-        fetch: async (url, options = {}) => {
-          const clerkToken = await session?.getToken({
-            template: "supabase",
-          });
+  // Create a custom supabase client that injects the Clerk Supabase token into the request headers
+  function createClerkSupabaseClient() {
+    return createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_KEY!,
+      {
+        global: {
+          // Get the custom Supabase token from Clerk
+          fetch: async (url, options = {}) => {
+            // The Clerk `session` object has the getToken() method      
+            const clerkToken = await session?.getToken({
+              // Pass the name of the JWT template you created in the Clerk Dashboard
+              // For this tutorial, you named it 'supabase'
+              template: 'supabase',
+            })
 
-          const headers = new Headers(options?.headers);
-          headers.set("Authorization", `Bearer ${clerkToken}`);
+            // Insert the Clerk Supabase token into the headers
+            const headers = new Headers(options?.headers)
+            headers.set('Authorization', `Bearer ${clerkToken}`)
 
-          return fetch(url, {
-            ...options,
-            headers,
-          });
+            // Call the default fetch
+            return fetch(url, {
+              ...options,
+              headers,
+            })
+          },
         },
       },
-    }
-  );
+    )
+  }
+
 }
