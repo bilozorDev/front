@@ -1,7 +1,7 @@
-import { createClient } from "@/utils/supabase/server";
 import { currentUser } from "@clerk/nextjs/server";
+import { createClerkSupabaseClient } from "@/utils/supabase/serverSide/createClerkSupabaseClientSsr";
 export default async function Home() {
-  const supabase = await createClient();
+  const supabase = await createClerkSupabaseClient();
   const { data: products } = await supabase.from("products").select();
   const user = await currentUser();
   if (!user) return <div>Not signed in</div>;

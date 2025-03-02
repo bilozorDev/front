@@ -1,11 +1,10 @@
-import { useCreateClerkSupabaseClient } from "@/utils/supabase/clerkSupabaseClient";
+import { createClient } from "@supabase/supabase-js";
 import { useMutation } from "@tanstack/react-query";
 
 export function useAddQuote() {
-  const supabase = useCreateClerkSupabaseClient();
-
   const createQuote = useMutation({
     mutationFn: async () => {
+      const supabase = await createClient();
       const { data, error } = await supabase
         .from("quotes")
         .insert([{}])
