@@ -8,6 +8,11 @@ export default function ClientCard({ client }: { client: Client }) {
       className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow"
     >
       <div className="flex w-full items-center justify-between space-x-6 p-6">
+        <img
+          alt=""
+          src={`https://placehold.co/400x400?text=${client.name?.[0].toUpperCase()}`}
+          className="size-10 shrink-0 rounded-full bg-gray-300"
+        />
         <div className="flex-1 truncate">
           <div className="flex items-center space-x-3">
             <h3 className="truncate capitalize text-sm font-medium text-gray-900">
@@ -16,11 +21,6 @@ export default function ClientCard({ client }: { client: Client }) {
           </div>
           <p className="mt-1 truncate text-sm text-gray-500">{client.email}</p>
         </div>
-        <img
-          alt=""
-          src={`https://placehold.co/400x400?text=${client.name?.[0].toUpperCase()}`}
-          className="size-10 shrink-0 rounded-full bg-gray-300"
-        />
       </div>
       <div>
         <div className="-mt-px flex divide-x divide-gray-200">
@@ -42,7 +42,7 @@ export default function ClientCard({ client }: { client: Client }) {
               className="relative inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-br-lg border border-transparent py-4 text-sm font-semibold text-gray-900"
             >
               <PhoneIcon aria-hidden="true" className="size-5 text-gray-400" />
-              Call
+              Create quote
             </a>
           </div>
         </div>
