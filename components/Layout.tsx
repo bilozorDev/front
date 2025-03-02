@@ -34,26 +34,26 @@ function classNames(...classes: string[]) {
 }
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: HomeIcon, current: true },
-  { name: "Quotes", href: "dashboard/quotes", icon: UsersIcon, current: false },
+  { name: "Quotes", href: "/dashboard/quotes", icon: UsersIcon, current: false },
   {
     name: "Inventory",
-    href: "dashboard/inventory",
+    href: "/dashboard/inventory",
     icon: FolderIcon,
     current: false,
   },
   {
     name: "Clients",
-    href: "dashboard/clients",
+    href: "/dashboard/clients",
     icon: UsersIcon,
     current: false,
   },
   {
     name: "Settings",
-    href: "dashboard/settings",
+    href: "/dashboard/settings",
     icon: DocumentDuplicateIcon,
     current: false,
   },
-  { name: "Reports", href: "#", icon: ChartPieIcon, current: false },
+  { name: "Reports", href: "/dashboard/reports", icon: ChartPieIcon, current: false },
 ];
 const teams = [
   { id: 1, name: "Heroicons", href: "#", initial: "H", current: false },
