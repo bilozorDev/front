@@ -1,5 +1,5 @@
-import { UserProfile } from "@clerk/nextjs";
-
-export default function Settings() {
-  return <UserProfile />;
+function SettingsPage() {
+  return <div>Settings</div>;
 }
+
+export default SettingsPage;

@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <QueryClientProvider client={queryClient}>
       <Layout>{children}</Layout>
-      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+      <ReactQueryDevtools initialIsOpen={false} />
       <Hydration />
     </QueryClientProvider>
   );
