@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "update-types": "supabase gen types typescript --local > types/supabase.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
