@@ -1,5 +1,4 @@
 import { Client } from "@/types/types.t";
-import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/20/solid";
 import {
   InformationCircleIcon,
   PlusCircleIcon,
@@ -27,7 +26,9 @@ export default function ClientCard({ client }: { client: Client }) {
               {client.name}
             </h3>
           </div>
-          <p className="mt-1 truncate text-sm text-gray-500">{client.email}</p>
+          <p className="mt-1 truncate text-sm text-gray-500">
+            {client.address}
+          </p>
         </div>
       </div>
       <div>

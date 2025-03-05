@@ -3,8 +3,7 @@
 import { useGetClients, useCreateClient } from "@/queries/clients/queries";
 import { useState } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { ExclamationCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { ClientInsert } from "@/types/types.t";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import ClientCard from "@/components/ClientCard";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -64,30 +63,29 @@ const formSchema = z.object({
 
 type FormSchema = z.infer<typeof formSchema>;
 
-// TODO: Add better error handling and revalidation after typing in the email field
-
 function AddClientDrawer({ open, setOpen }: AddClientDrawerProps) {
-  const { mutate: createClient, isPending } = useCreateClient();
-  const [newClient, setNewClient] = useState<FormSchema>({
-    name: "test",
-    email: "test@test.com",
-    phone: "1234567890",
-    address: "123 Main St",
-  });
+  const { mutate: createClient } = useCreateClient();
   const {
     register,
     handleSubmit,
     formState: { errors },
     setError,
+    reset,
   } = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
-    defaultValues: newClient,
+    defaultValues: {
+      name: "test",
+      email: "test@test.com",
+      phone: "1234567890",
+      address: "123 Main St",
+    },
   });
 
   const onSubmit = (data: FormSchema) => {
     createClient(data, {
       onSuccess: () => {
         setOpen(false);
+        reset();
       },
       onError: (error) => {
         // Check if the error contains information about duplicate email
