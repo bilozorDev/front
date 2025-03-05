@@ -3,10 +3,12 @@
 import { useGetClients, useCreateClient } from "@/queries/clients/queries";
 import { useState } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { ExclamationCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ClientInsert } from "@/types/types.t";
 import ClientCard from "@/components/ClientCard";
-
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 function ClientsPage() {
   const { data, isLoading, error } = useGetClients();
   const [open, setOpen] = useState(false);
@@ -53,32 +55,61 @@ type AddClientDrawerProps = {
   setOpen: (open: boolean) => void;
 };
 
+const formSchema = z.object({
+  name: z.string().min(1, { message: "Name is required" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  phone: z.string().min(1),
+  address: z.string().min(1),
+});
+
+type FormSchema = z.infer<typeof formSchema>;
+
 // TODO: Add better error handling and revalidation after typing in the email field
 
 function AddClientDrawer({ open, setOpen }: AddClientDrawerProps) {
-  const [newClient, setNewClient] = useState<ClientInsert>({
+  const { mutate: createClient, isPending } = useCreateClient();
+  const [newClient, setNewClient] = useState<FormSchema>({
     name: "test",
     email: "test@test.com",
     phone: "1234567890",
-    address: "123 Main St, Anytown, USA",
+    address: "123 Main St",
   });
-  const { mutate: createClient, isPending, error } = useCreateClient();
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    createClient(newClient, {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError,
+  } = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
+    defaultValues: newClient,
+  });
+
+  const onSubmit = (data: FormSchema) => {
+    createClient(data, {
       onSuccess: () => {
         setOpen(false);
-        setNewClient({
-          name: "",
-          email: "",
-          phone: "",
-          address: "",
-        });
       },
       onError: (error) => {
-        console.error(error);
+        // Check if the error contains information about duplicate email
+        if (error.message?.includes("duplicate_email")) {
+          setError("email", {
+            type: "manual",
+            message: `Client with email ${data.email} already exists`,
+          });
+        } else {
+          console.error(error);
+        }
       },
     });
+  };
+
+  const getInputClassName = (fieldName: keyof FormSchema) => {
+    const baseClasses =
+      "block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6";
+
+    return errors[fieldName]
+      ? `${baseClasses} outline-red-500 outline-2`
+      : baseClasses;
   };
 
   return (
@@ -94,7 +125,7 @@ function AddClientDrawer({ open, setOpen }: AddClientDrawerProps) {
             >
               <form
                 className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
-                onSubmit={handleSubmit}
+                onSubmit={handleSubmit(onSubmit)}
               >
                 <div className="h-0 flex-1 overflow-y-auto">
                   <div className="bg-indigo-700 px-4 py-6 sm:px-6">
@@ -135,17 +166,16 @@ function AddClientDrawer({ open, setOpen }: AddClientDrawerProps) {
                           <div className="mt-2">
                             <input
                               id="project-name"
-                              name="project-name"
                               type="text"
-                              value={newClient.name}
-                              onChange={(e) =>
-                                setNewClient({
-                                  ...newClient,
-                                  name: e.target.value,
-                                })
-                              }
-                              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                              required
+                              {...register("name")}
+                              className={getInputClassName("name")}
                             />
+                            {errors.name && (
+                              <div className="mt-1 text-sm text-red-600">
+                                {errors.name.message}
+                              </div>
+                            )}
                           </div>
                         </div>
                         <div>
@@ -155,32 +185,22 @@ function AddClientDrawer({ open, setOpen }: AddClientDrawerProps) {
                           >
                             Email
                           </label>
-                          <div className="mt-2">
+                          <div className="mt-2 relative">
                             <input
                               id="client-email"
-                              name="client-email"
                               type="email"
-                              value={newClient.email ?? ""}
-                              onChange={(e) =>
-                                setNewClient({
-                                  ...newClient,
-                                  email: e.target.value,
-                                })
-                              }
-                              className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${
-                                error ? "outline-red-500 outline-2" : ""
-                              }`}
+                              required
+                              {...register("email")}
+                              className={getInputClassName("email")}
                             />
-                          </div>
-                          {error && (
-                            <div className="rounded-md bg-red-50 p-3">
-                              <div className="flex">
-                                <div className="text-sm text-red-700">
-                                  {error.message}
+                            {errors.email && (
+                              <>
+                                <div className="mt-1 text-sm text-red-600">
+                                  {errors.email.message}
                                 </div>
-                              </div>
-                            </div>
-                          )}
+                              </>
+                            )}
+                          </div>
                         </div>
                         <div>
                           <label
@@ -192,15 +212,8 @@ function AddClientDrawer({ open, setOpen }: AddClientDrawerProps) {
                           <div className="mt-2">
                             <input
                               id="client-phone"
-                              name="client-phone"
                               type="tel"
-                              value={newClient.phone ?? ""}
-                              onChange={(e) =>
-                                setNewClient({
-                                  ...newClient,
-                                  phone: e.target.value,
-                                })
-                              }
+                              {...register("phone")}
                               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                             />
                           </div>
@@ -215,15 +228,8 @@ function AddClientDrawer({ open, setOpen }: AddClientDrawerProps) {
                           <div className="mt-2">
                             <input
                               id="client-address"
-                              name="client-address"
                               type="text"
-                              value={newClient.address ?? ""}
-                              onChange={(e) =>
-                                setNewClient({
-                                  ...newClient,
-                                  address: e.target.value,
-                                })
-                              }
+                              {...register("address")}
                               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                             />
                           </div>

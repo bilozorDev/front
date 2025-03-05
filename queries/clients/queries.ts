@@ -31,7 +31,7 @@ const addClient = async (client: ClientInsert) => {
 
   // If client exists, throw error
   if (existingClient) {
-    throw new Error("Client with this email already exists");
+    throw new Error("duplicate_email");
   }
 
   // If client doesn't exist, insert
