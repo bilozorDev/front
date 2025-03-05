@@ -1,12 +1,10 @@
 "use client";
 
-import { useGetClients } from "@/queries/clients/queries";
+import { useGetClients, useCreateClient } from "@/queries/clients/queries";
 import { useState } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { ClientInsert } from "@/types/types.t";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createClient } from "@/utils/supabase/client";
 import ClientCard from "@/components/ClientCard";
 
 function ClientsPage() {
@@ -55,29 +53,12 @@ type AddClientDrawerProps = {
   setOpen: (open: boolean) => void;
 };
 
-const useCreateClient = () => {
-  const supabase = createClient();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (client: ClientInsert) => {
-      const { data, error } = await supabase.from("clients").insert(client);
-      if (error) {
-        throw new Error(error.message);
-      }
-      return data;
-    },
-    onSuccess: () => {
-      // Invalidate and refetch the clients query
-      queryClient.invalidateQueries({ queryKey: ["clients"] });
-    },
-  });
-};
 function AddClientDrawer({ open, setOpen }: AddClientDrawerProps) {
   const [newClient, setNewClient] = useState<ClientInsert>({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
+    name: "test",
+    email: "test@test.com",
+    phone: "1234567890",
+    address: "123 Main St, Anytown, USA",
   });
   const { mutate: createClient } = useCreateClient();
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

@@ -6,9 +6,9 @@ export default function NewQuote() {
   return (
     <>
       <QuoteTable />
-      <Suspense>
+      {/* <Suspense>
         <ManualProductAdd />
-      </Suspense>
+      </Suspense> */}
     </>
   );
 }

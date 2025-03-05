@@ -17,7 +17,7 @@ import {
 import { useCallback, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { formatPrice } from "@/utils/formatPrice";
-import { useFuzzyProductSearch } from "@/queries/fuzzyProductSearch";
+// import { useFuzzyProductSearch } from "@/queries/fuzzyProductSearch";
 import { Product } from "@/types/types.t";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import useQuoteStore from "@/store/quote-store";
@@ -36,7 +36,7 @@ export default function AddProductSearch({
 }) {
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 300);
-  const { data, isLoading } = useFuzzyProductSearch(debouncedQuery);
+  // const { data, isLoading } = useFuzzyProductSearch(debouncedQuery);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
