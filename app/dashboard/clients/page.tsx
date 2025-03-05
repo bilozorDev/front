@@ -53,6 +53,8 @@ type AddClientDrawerProps = {
   setOpen: (open: boolean) => void;
 };
 
+// TODO: Add better error handling and revalidation after typing in the email field
+
 function AddClientDrawer({ open, setOpen }: AddClientDrawerProps) {
   const [newClient, setNewClient] = useState<ClientInsert>({
     name: "test",
@@ -60,18 +62,25 @@ function AddClientDrawer({ open, setOpen }: AddClientDrawerProps) {
     phone: "1234567890",
     address: "123 Main St, Anytown, USA",
   });
-  const { mutate: createClient } = useCreateClient();
+  const { mutate: createClient, isPending, error } = useCreateClient();
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    createClient(newClient);
-    setOpen(false);
-    setNewClient({
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
+    createClient(newClient, {
+      onSuccess: () => {
+        setOpen(false);
+        setNewClient({
+          name: "",
+          email: "",
+          phone: "",
+          address: "",
+        });
+      },
+      onError: (error) => {
+        console.error(error);
+      },
     });
   };
+
   return (
     <Dialog open={open} onClose={setOpen} className="relative z-50">
       <div className="fixed inset-0" />
@@ -112,6 +121,7 @@ function AddClientDrawer({ open, setOpen }: AddClientDrawerProps) {
                       </p>
                     </div>
                   </div>
+
                   <div className="flex flex-1 flex-col justify-between">
                     <div className="divide-y divide-gray-200 px-4 sm:px-6">
                       <div className="space-y-6 pb-5 pt-6">
@@ -157,9 +167,20 @@ function AddClientDrawer({ open, setOpen }: AddClientDrawerProps) {
                                   email: e.target.value,
                                 })
                               }
-                              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                              className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${
+                                error ? "outline-red-500 outline-2" : ""
+                              }`}
                             />
                           </div>
+                          {error && (
+                            <div className="rounded-md bg-red-50 p-3">
+                              <div className="flex">
+                                <div className="text-sm text-red-700">
+                                  {error.message}
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                         <div>
                           <label

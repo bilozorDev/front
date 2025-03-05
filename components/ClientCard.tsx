@@ -1,6 +1,10 @@
 import { Client } from "@/types/types.t";
 import { EnvelopeIcon, PhoneIcon } from "@heroicons/react/20/solid";
-
+import {
+  InformationCircleIcon,
+  PlusCircleIcon,
+} from "@heroicons/react/24/outline";
+import Link from "next/link";
 export default function ClientCard({ client }: { client: Client }) {
   return (
     <div
@@ -10,7 +14,11 @@ export default function ClientCard({ client }: { client: Client }) {
       <div className="flex w-full items-center justify-between space-x-6 p-6">
         <img
           alt=""
-          src={`https://placehold.co/400x400?text=${client.name?.[0].toUpperCase()}`}
+          src={
+            client.name
+              ? `https://placehold.co/400x400?text=${client.name?.[0].toUpperCase()}`
+              : `https://placehold.co/400x400?text=C`
+          }
           className="size-10 shrink-0 rounded-full bg-gray-300"
         />
         <div className="flex-1 truncate">
@@ -25,25 +33,28 @@ export default function ClientCard({ client }: { client: Client }) {
       <div>
         <div className="-mt-px flex divide-x divide-gray-200">
           <div className="flex w-0 flex-1">
-            <a
-              href={`mailto:${client.email}`}
-              className="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900"
+            <Link
+              href={`/dashboard/clients/${client.id}`}
+              className="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900 hover:bg-indigo-50 hover:border-indigo-200"
             >
-              <EnvelopeIcon
+              <InformationCircleIcon
                 aria-hidden="true"
                 className="size-5 text-gray-400"
               />
-              Email
-            </a>
+              View client details
+            </Link>
           </div>
           <div className="-ml-px flex w-0 flex-1">
-            <a
-              href={`tel:${client.phone}`}
-              className="relative inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-br-lg border border-transparent py-4 text-sm font-semibold text-gray-900"
+            <Link
+              href={`/dashboard/quotes/new?clientId=${client.id}`}
+              className="relative inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-br-lg border border-transparent py-4 text-sm font-semibold text-gray-900 hover:bg-indigo-50 hover:border-indigo-200"
             >
-              <PhoneIcon aria-hidden="true" className="size-5 text-gray-400" />
+              <PlusCircleIcon
+                aria-hidden="true"
+                className="size-5 text-gray-400"
+              />
               Create quote
-            </a>
+            </Link>
           </div>
         </div>
       </div>

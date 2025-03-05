@@ -16,16 +16,33 @@ export const useGetClients = () => {
   });
 };
 
-// add client
+// add client with existence check
 const addClient = async (client: ClientInsert) => {
   const supabase = createClient();
+
+  // First check if client exists
+  const { data: existingClient, error: checkError } = await supabase
+    .from("clients")
+    .select("*")
+    .eq("email", client.email)
+    .maybeSingle(); // Use maybeSingle to avoid error if not found
+
+  if (checkError) throw checkError;
+
+  // If client exists, throw error
+  if (existingClient) {
+    throw new Error("Client with this email already exists");
+  }
+
+  // If client doesn't exist, insert
   const { data, error } = await supabase.from("clients").insert(client);
+  if (error) throw error;
+
   return data;
 };
 
 export const useCreateClient = () => {
   const queryClient = useQueryClient();
-  const supabase = createClient();
   return useMutation({
     mutationFn: addClient,
     onSuccess: () => {
