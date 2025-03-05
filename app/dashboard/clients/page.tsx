@@ -8,27 +8,35 @@ import { ClientInsert } from "@/types/types.t";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/utils/supabase/client";
 import ClientCard from "@/components/ClientCard";
-
+import { ClientCardSkeleton } from "@/components/ClientCard";
+import PageHeaderWithAction from "@/components/PageHeaderWithAction";
 function ClientsPage() {
   const { data, isLoading, error } = useGetClients();
   const [open, setOpen] = useState(false);
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <>
+        <PageHeaderWithAction
+          title="Clients"
+          actionText="Add Client"
+          action={() => setOpen(true)}
+        />
+        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, index) => (
+            <ClientCardSkeleton key={index} />
+          ))}
+        </div>
+      </>
+    );
   if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div>
-      <div className="border-b border-gray-200 pb-5 sm:flex sm:items-center sm:justify-between">
-        <h3 className="text-base font-semibold text-gray-900">Clients</h3>
-        <div className="mt-3 sm:mt-0 sm:ml-4">
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          >
-            Create new client
-          </button>
-        </div>
-      </div>
+      <PageHeaderWithAction
+        title="Clients"
+        actionText="Add Client"
+        action={() => setOpen(true)}
+      />
       {data?.length === 0 && (
         <div>
           No clients found
