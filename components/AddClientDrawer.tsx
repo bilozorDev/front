@@ -3,21 +3,14 @@
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { ClientInsert } from "@/types/types.t";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useCreateClient } from "@/queries/clients/queries";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useQueryParamsToggle } from "@/hooks/useQueryParamsToggle";
 
 export default function AddClientDrawer() {
-  const [open, setOpen] = useState(false);
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-  useEffect(() => {
-    const addClientManually = searchParams.get("addClient");
-    if (addClientManually) {
-      setOpen(true);
-    }
-  }, [searchParams]);
+  const { isActive, handleToggle } = useQueryParamsToggle({
+    paramsName: "addClient",
+  });
 
   const [newClient, setNewClient] = useState<ClientInsert>({
     name: "test",
@@ -30,7 +23,7 @@ export default function AddClientDrawer() {
     e.preventDefault();
     createClient(newClient, {
       onSuccess: () => {
-        setOpen(false);
+        handleToggle();
         setNewClient({
           name: "",
           email: "",
@@ -45,14 +38,11 @@ export default function AddClientDrawer() {
   };
 
   const handleClose = () => {
-    setOpen(false);
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("addClient");
-    router.push(pathname + "?" + params.toString());
+    handleToggle();
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} className="relative z-50">
+    <Dialog open={isActive} onClose={handleClose} className="relative z-50">
       <div className="fixed inset-0" />
       <div className="fixed inset-0 overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">
@@ -74,7 +64,7 @@ export default function AddClientDrawer() {
                       <div className="ml-3 flex h-7 items-center">
                         <button
                           type="button"
-                          onClick={() => setOpen(false)}
+                          onClick={handleClose}
                           className="relative rounded-md bg-indigo-700 text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
                         >
                           <span className="absolute -inset-2.5" />
