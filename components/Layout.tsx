@@ -41,8 +41,8 @@ const navigation = [
     current: false,
   },
   {
-    name: "Inventory",
-    href: "/dashboard/inventory",
+    name: "Products",
+    href: "/dashboard/products",
     icon: FolderIcon,
     current: false,
   },
@@ -83,7 +83,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     queryKey: ["user"],
     queryFn: getUser,
   });
-  console.log(user);
   return (
     <div className="relative">
       <div>
@@ -378,9 +377,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                           onClick={() => {
                             if (item.action) {
                               item.action();
-                            }
-                            else {
-                              router.push(item.href);   
+                            } else {
+                              router.push(item.href);
                             }
                           }}
                         >
