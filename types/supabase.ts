@@ -64,15 +64,105 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          category: string | null
+          cost: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          last_updated: string | null
+          min_stock_level: number | null
+          name: string
+          notes: string | null
+          price_to_client: number | null
+          purchase_date: string | null
+          qty: number | null
+          sku: string | null
+          status: string | null
+          tax_rate: number | null
+          unit_of_measure: string | null
+          user_id: string
+          vendor: string | null
+        }
+        Insert: {
+          category?: string | null
+          cost?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          last_updated?: string | null
+          min_stock_level?: number | null
+          name: string
+          notes?: string | null
+          price_to_client?: number | null
+          purchase_date?: string | null
+          qty?: number | null
+          sku?: string | null
+          status?: string | null
+          tax_rate?: number | null
+          unit_of_measure?: string | null
+          user_id?: string
+          vendor?: string | null
+        }
+        Update: {
+          category?: string | null
+          cost?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          last_updated?: string | null
+          min_stock_level?: number | null
+          name?: string
+          notes?: string | null
+          price_to_client?: number | null
+          purchase_date?: string | null
+          qty?: number | null
+          sku?: string | null
+          status?: string | null
+          tax_rate?: number | null
+          unit_of_measure?: string | null
+          user_id?: string
+          vendor?: string | null
+        }
+        Relationships: []
+      }
+      quotes: {
+        Row: {
+          created_at: string
+          due_date: string | null
+          id: string
+          notes: string | null
+          total_amount: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          total_amount: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          total_amount?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      requesting_user_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

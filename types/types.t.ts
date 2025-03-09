@@ -6,23 +6,31 @@ export type Client = Tables<"clients">;
 export type ClientInsert = TablesInsert<"clients">;
 export type ClientUpdate = TablesUpdate<"clients">;
 
-export interface Product {
-  id: string;
-  vendor_id: string;
-  name: string;
-  model: string;
-  description: string;
-  price: number;
-  product_url: string;
-  image_url: string;
-  image_urls: string[];
-  availability: string;
-  specs: Record<string, unknown>;
-  last_updated: string;
-  created_at: string;
-  category_id: string;
-  specs_image_url: string | null;
-}
+// Product types
+export type Product = Tables<"products">;
+export type ProductInsert = TablesInsert<"products">;
+export type ProductUpdate = TablesUpdate<"products">;
+
+// Quote types
+export type Quote = Tables<"quotes">;
+export type QuoteInsert = TablesInsert<"quotes">;
+export type QuoteUpdate = TablesUpdate<"quotes">;
+
+type ProductCategory = "Hardware" | "Software" | "Services";
+type ProductHardwareSubCategory =
+  | "Desktops"
+  | "Laptops"
+  | "Tablets"
+  | "Phones"
+  | "Monitors"
+  | "Printers"
+  | "Scanners"
+  | "Projectors"
+  | "Audio"
+  | "Video"
+  | "Storage"
+  | "Networking"
+  | "Security";
 
 export interface AddProductSearchProps {
   open: boolean;
