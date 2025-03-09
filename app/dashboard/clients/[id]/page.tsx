@@ -1,5 +1,3 @@
-import { Client } from "@/types/types.t";
-import { use } from "react";
 import {
   ChevronRightIcon,
   MapPinIcon,
@@ -16,7 +14,7 @@ import {
   ArrowPathIcon,
   ArrowUpCircleIcon,
 } from "@heroicons/react/20/solid";
-
+import { getClientByIdServer } from "@/queries/clients/queries";
 const statuses = {
   Paid: "text-green-700 bg-green-50 ring-green-600/20",
   Withdraw: "text-gray-600 bg-gray-50 ring-gray-500/10",
@@ -79,12 +77,14 @@ const days = [
     ],
   },
 ];
-export default function ClientPage({
+export default async function ClientPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = use(params);
+  const { id } = await params;
+  const { data } = await getClientByIdServer(id);
+  console.log(data.name);
   return (
     <>
       <div className="lg:flex lg:items-center lg:justify-between">
@@ -111,14 +111,14 @@ export default function ClientPage({
                     href="#"
                     className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
                   >
-                    {data?.[0]?.name}
+                    {data?.name}
                   </a>
                 </div>
               </li>
             </ol>
           </nav>
           <h2 className="mt-2 text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-            {data?.[0]?.name}
+            {data?.name}
           </h2>
           <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
             <div className="mt-2 flex items-center text-sm text-gray-500">
@@ -126,21 +126,21 @@ export default function ClientPage({
                 aria-hidden="true"
                 className="mr-1.5 size-5 shrink-0 text-gray-400"
               />
-              {data?.[0]?.address}
+              {data?.address}
             </div>
             <div className="mt-2 flex items-center text-sm text-gray-500">
               <PhoneIcon
                 aria-hidden="true"
                 className="mr-1.5 size-5 shrink-0 text-gray-400"
               />
-              {data?.[0]?.phone}
+              {data?.phone}
             </div>
             <div className="mt-2 flex items-center text-sm text-gray-500">
               <EnvelopeIcon
                 aria-hidden="true"
                 className="mr-1.5 size-5 shrink-0 text-gray-400"
               />
-              {data?.[0]?.email}
+              {data?.email}
             </div>
           </div>
         </div>

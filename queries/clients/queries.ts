@@ -10,6 +10,17 @@ export const getClientsServer = async () => {
   return { data: data as Client[], error };
 };
 
+// get client by id server side
+export const getClientByIdServer = async (id: string) => {
+  const supabase = await createServerClient();
+  const { data, error } = await supabase
+    .from("clients")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  return { data: data as Client, error };
+};
+
 // get clients client side
 const getClients = async () => {
   const supabase = createClient();
@@ -56,5 +67,24 @@ export const useCreateClient = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
     },
+  });
+};
+
+// get client by email
+export const getClientByEmail = async (email: string) => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("clients")
+    .select("*")
+    .eq("email", email)
+    .maybeSingle();
+  return { data: data as Client, error };
+};
+
+export const useGetClientByEmail = (email: string) => {
+  return useQuery({
+    queryKey: ["client", email],
+    queryFn: () => getClientByEmail(email),
+    enabled: !!email,
   });
 };

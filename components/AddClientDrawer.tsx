@@ -1,42 +1,62 @@
 "use client";
 
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { Dialog, DialogPanel, DialogTitle, Field } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { ClientInsert } from "@/types/types.t";
-import { useState } from "react";
-import { useCreateClient } from "@/queries/clients/queries";
+import { getClientByEmail, useCreateClient } from "@/queries/clients/queries";
 import { useQueryParamsToggle } from "@/hooks/useQueryParamsToggle";
+import { z } from "zod";
+import { AnyFieldApi, useForm, useStore } from "@tanstack/react-form";
+
+function isValidEmail(email: string) {
+  const emailRegex = /\S+@\S+\.\S+/;
+  return emailRegex.test(email);
+}
+
+const personSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email().min(1),
+  phone: z.string().min(1),
+  address: z.string().min(1),
+});
+
+function FieldInfo({ field }: { field: AnyFieldApi }) {
+  return (
+    <>
+      {field.state.meta.isTouched && field.state.meta.errors.length ? (
+        <em>{field.state.meta.errors.map((err) => err.message).join(",")}</em>
+      ) : null}
+      {field.state.meta.isValidating ? "Validating..." : null}
+    </>
+  );
+}
 
 export default function AddClientDrawer() {
   const { isActive, handleToggle } = useQueryParamsToggle({
     paramsName: "addClient",
   });
 
-  const [newClient, setNewClient] = useState<ClientInsert>({
-    name: "test",
-    email: "test@test.com",
-    phone: "1234567890",
-    address: "123 Main St, Anytown, USA",
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+    },
+    validators: {
+      onChange: personSchema,
+    },
+
+    onSubmit: async ({ value }) => {
+      createClient(value, {
+        onSuccess: () => {
+          handleToggle();
+          form.reset();
+        },
+        onError: (error) => {},
+      });
+    },
   });
   const { mutate: createClient, isPending, error } = useCreateClient();
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    createClient(newClient, {
-      onSuccess: () => {
-        handleToggle();
-        setNewClient({
-          name: "",
-          email: "",
-          phone: "",
-          address: "",
-        });
-      },
-      onError: (error) => {
-        console.error(error);
-      },
-    });
-  };
-
   const handleClose = () => {
     handleToggle();
   };
@@ -53,7 +73,11 @@ export default function AddClientDrawer() {
             >
               <form
                 className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
-                onSubmit={handleSubmit}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  form.handleSubmit();
+                }}
               >
                 <div className="h-0 flex-1 overflow-y-auto">
                   <div className="bg-indigo-700 px-4 py-6 sm:px-6">
@@ -92,54 +116,85 @@ export default function AddClientDrawer() {
                             Client name
                           </label>
                           <div className="mt-2">
-                            <input
-                              id="project-name"
-                              name="project-name"
-                              type="text"
-                              value={newClient.name}
-                              onChange={(e) =>
-                                setNewClient({
-                                  ...newClient,
-                                  name: e.target.value,
-                                })
-                              }
-                              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                            <form.Field
+                              name="name"
+                              children={({
+                                state,
+                                handleChange,
+                                handleBlur,
+                              }) => (
+                                <input
+                                  value={state.value}
+                                  onChange={(e) => handleChange(e.target.value)}
+                                  onBlur={handleBlur}
+                                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                />
+                              )}
                             />
                           </div>
                         </div>
+
+                        {/* Email */}
                         <div>
-                          <label
-                            htmlFor="client-email"
-                            className="block text-sm/6 font-medium text-gray-900"
-                          >
-                            Email
-                          </label>
                           <div className="mt-2">
-                            <input
-                              id="client-email"
-                              name="client-email"
-                              type="email"
-                              value={newClient.email ?? ""}
-                              onChange={(e) =>
-                                setNewClient({
-                                  ...newClient,
-                                  email: e.target.value,
-                                })
-                              }
-                              className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${
-                                error ? "outline-red-500 outline-2" : ""
-                              }`}
-                            />
+                            <form.Field
+                              name="email"
+                              validators={{
+                                onChangeAsyncDebounceMs: 1000,
+                                onChangeAsync: z
+                                  .string()
+                                  .email()
+                                  .refine(async (value) => {
+                                    const client = await getClientByEmail(
+                                      value
+                                    );
+                                    if (client.data) {
+                                      return `Email ${value} already exists`;
+                                    }
+                                    return undefined;
+                                  }),
+                              }}
+                            >
+                              {(field) => (
+                                <>
+                                  <label
+                                    htmlFor="client-email"
+                                    className="block text-sm/6 font-medium text-gray-900"
+                                  >
+                                    Email
+                                  </label>
+                                  <input
+                                    type="email"
+                                    value={field.state.value}
+                                    onChange={(e) =>
+                                      field.handleChange(e.target.value)
+                                    }
+                                    onBlur={field.handleBlur}
+                                    className={`block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${
+                                      field.state.meta.isTouched &&
+                                      field.state.meta.errors.length
+                                        ? "outline-red-500 outline-2"
+                                        : ""
+                                    }`}
+                                  />
+                                  <FieldInfo field={field} />
+                                  {/* {field.state.meta.isTouched &&
+                                  field.state.meta.isValidating &&
+                                  isValidEmail(field.state.value) ? (
+                                    <span className="text-indigo-500">
+                                      Checking if {field.state.value} is
+                                      available...
+                                    </span>
+                                  ) : field.state.meta.isTouched &&
+                                    field.state.meta.errors.length ? (
+                                    <span className="text-red-500">
+                                      {JSON.stringify(field.state.meta.errors)}
+                                    </span>
+                                  ) : null} */}
+                                </>
+                              )}
+                            </form.Field>
                           </div>
-                          {error && (
-                            <div className="rounded-md bg-red-50 p-3">
-                              <div className="flex">
-                                <div className="text-sm text-red-700">
-                                  {error.message}
-                                </div>
-                              </div>
-                            </div>
-                          )}
                         </div>
                         <div>
                           <label
@@ -149,18 +204,23 @@ export default function AddClientDrawer() {
                             Phone
                           </label>
                           <div className="mt-2">
-                            <input
-                              id="client-phone"
-                              name="client-phone"
-                              type="tel"
-                              value={newClient.phone ?? ""}
-                              onChange={(e) =>
-                                setNewClient({
-                                  ...newClient,
-                                  phone: e.target.value,
-                                })
-                              }
-                              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                            <form.Field
+                              name="phone"
+                              children={({
+                                state,
+                                handleChange,
+                                handleBlur,
+                              }) => (
+                                <input
+                                  id="client-phone"
+                                  name="client-phone"
+                                  type="tel"
+                                  value={state.value}
+                                  onChange={(e) => handleChange(e.target.value)}
+                                  onBlur={handleBlur}
+                                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                />
+                              )}
                             />
                           </div>
                         </div>
@@ -172,18 +232,23 @@ export default function AddClientDrawer() {
                             Address
                           </label>
                           <div className="mt-2">
-                            <input
-                              id="client-address"
-                              name="client-address"
-                              type="text"
-                              value={newClient.address ?? ""}
-                              onChange={(e) =>
-                                setNewClient({
-                                  ...newClient,
-                                  address: e.target.value,
-                                })
-                              }
-                              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                            <form.Field
+                              name="address"
+                              children={({
+                                state,
+                                handleChange,
+                                handleBlur,
+                              }) => (
+                                <input
+                                  id="client-address"
+                                  name="client-address"
+                                  type="text"
+                                  value={state.value}
+                                  onChange={(e) => handleChange(e.target.value)}
+                                  onBlur={handleBlur}
+                                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                />
+                              )}
                             />
                           </div>
                         </div>
@@ -199,9 +264,18 @@ export default function AddClientDrawer() {
                   >
                     Cancel
                   </button>
-                  <button className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                    Add
-                  </button>
+                  <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                    children={([canSubmit, isSubmitting]) => (
+                      <button
+                        type="submit"
+                        disabled={!canSubmit}
+                        className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                      >
+                        {isSubmitting ? "..." : "Add"}
+                      </button>
+                    )}
+                  />
                 </div>
               </form>
             </DialogPanel>
