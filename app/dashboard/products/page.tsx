@@ -16,7 +16,13 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisHorizontalIcon } from "@heroicons/react/20/solid";
-
+import {
+  ChartBarIcon,
+  ChartPieIcon,
+  TvIcon,
+} from "@heroicons/react/24/outline";
+import { useState } from "react";
+import PageHeaderWithAction from "@/components/PageHeaderWithAction";
 interface Tab {
   name: string;
   searchParam: string;
@@ -47,7 +53,11 @@ export default function Products() {
   console.log(products);
   return (
     <div>
-      <h1>Products</h1>
+      <PageHeaderWithAction
+        title="Products"
+        action={() => {}}
+        actionText="Add new product"
+      />
       <Tabs />
       {products?.length === 0 && <div>No products found</div>}
 
@@ -239,52 +249,107 @@ function classNames(...classes: string[]) {
 }
 
 export function ProductCard({ product }: { product: Product }) {
+  const [viewDetails, setViewDetails] = useState(false);
+
   return (
-    <div className="relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6">
-      <div className="flex min-w-0 gap-x-4">
-        <ImageUrl product={product} />
-        <div className="min-w-0 flex-auto">
-          <p className="text-sm/6 font-semibold text-gray-900">
-            <a href={product.href}>
-              <span className="absolute inset-x-0 -top-px bottom-0" />
-              {product.name}
-            </a>
-          </p>
-          <p className="mt-1 flex text-xs/5 text-gray-500">
-            <a
-              href={`mailto:${product.email}`}
-              className="relative truncate hover:underline"
-            >
-              {product.email}
-            </a>
-          </p>
-        </div>
-      </div>
-      <div className="flex shrink-0 items-center gap-x-4">
-        <div className="hidden sm:flex sm:flex-col sm:items-end">
-          <p className="text-sm/6 text-gray-900">{product.vendor}</p>
-          {product.last_updated ? (
-            <p className="mt-1 text-xs/5 text-gray-500">
-              Last seen{" "}
-              <time dateTime={product.last_updated}>
-                {product.last_updated}
-              </time>
+    <>
+      <div
+        className={`relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6 ${
+          viewDetails ? "bg-gray-100" : ""
+        }`}
+      >
+        <div className="flex min-w-0 gap-x-4">
+          <ImageUrl product={product as ProductWithCategory} />
+          <div className="min-w-0 flex-auto">
+            <p className="text-sm/6 font-semibold text-gray-900">
+              <button onClick={() => setViewDetails(!viewDetails)}>
+                <span className="absolute inset-x-0 -top-px bottom-0" />
+                {product.name}
+              </button>
             </p>
-          ) : (
-            <div className="mt-1 flex items-center gap-x-1.5">
-              <div className="flex-none rounded-full bg-emerald-500/20 p-1">
-                <div className="size-1.5 rounded-full bg-emerald-500" />
-              </div>
-              <p className="text-xs/5 text-gray-500">Online</p>
-            </div>
-          )}
+            <p className="mt-1 flex text-xs/5 text-gray-500">
+              <a
+                href={`mailto:${product.email}`}
+                className="relative truncate hover:underline"
+              >
+                {product.email}
+              </a>
+            </p>
+          </div>
         </div>
-        <ChevronRightIcon
-          aria-hidden="true"
-          className="size-5 flex-none text-gray-400"
-        />
+        <div className="flex shrink-0 items-center gap-x-4">
+          <div className="hidden sm:flex sm:flex-col sm:items-end">
+            <p className="text-sm/6 text-gray-900">{product.vendor}</p>
+            {product.last_updated ? (
+              <p className="mt-1 text-xs/5 text-gray-500">
+                Last seen{" "}
+                <time dateTime={product.last_updated}>
+                  {product.last_updated}
+                </time>
+              </p>
+            ) : (
+              <div className="mt-1 flex items-center gap-x-1.5">
+                <div className="flex-none rounded-full bg-emerald-500/20 p-1">
+                  <div className="size-1.5 rounded-full bg-emerald-500" />
+                </div>
+                <p className="text-xs/5 text-gray-500">
+                  {product.qty} in stock
+                </p>
+              </div>
+            )}
+          </div>
+          <ChevronRightIcon
+            aria-hidden="true"
+            className={`size-5 flex-none text-gray-400 transition-transform duration-300 ${
+              viewDetails ? "rotate-90" : ""
+            }`}
+            onClick={() => setViewDetails(!viewDetails)}
+          />
+        </div>
       </div>
-    </div>
+      {viewDetails && (
+        <div className="px-4 py-5 sm:px-6">
+          <div>
+            <dl className="divide-y divide-gray-100">
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm/6 font-medium text-gray-900">Model</dt>
+                <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  {product.name}
+                </dd>
+              </div>
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm/6 font-medium text-gray-900">Vendor</dt>
+                <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  {product.vendor}
+                </dd>
+              </div>
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm/6 font-medium text-gray-900">
+                  Description
+                </dt>
+                <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  {product.description}
+                </dd>
+              </div>
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm/6 font-medium text-gray-900">Cost</dt>
+                <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  ${product.cost}
+                </dd>
+              </div>
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt className="text-sm/6 font-medium text-gray-900">
+                  Stock Level
+                </dt>
+                <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  {product.qty} in stock
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -294,13 +359,13 @@ const ImageUrl = ({ product }: { product: ProductWithCategory }) => {
     return <ComputerDesktopIcon className="mr-2 size-5" />;
   }
   if (product.product_category.slug === "peripherals") {
-    return <UserIcon className="mr-2 size-5" />;
+    return <TvIcon className="mr-2 size-5" />;
   }
   if (product.product_category.slug === "networking") {
-    return <UserIcon className="mr-2 size-5" />;
+    return <ChartBarIcon className="mr-2 size-5" />;
   }
   if (product.product_category.slug === "services") {
-    return <UserIcon className="mr-2 size-5" />;
+    return <ChartPieIcon className="mr-2 size-5" />;
   }
   return <UserIcon className="mr-2 size-5" />;
 };
