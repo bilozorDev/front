@@ -1,5 +1,5 @@
 "use client";
-import { getClientsServer, useGetClients } from "@/queries/clients/queries";
+import { useGetClients } from "@/queries/clients/queries";
 import ClientCard from "@/components/ClientCard";
 import AddClientDrawer from "@/components/AddClientDrawer";
 import PageHeaderWithAction from "@/components/PageHeaderWithAction";

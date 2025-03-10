@@ -23,6 +23,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import PageHeaderWithAction from "@/components/PageHeaderWithAction";
+import AddProductDrawer from "@/components/AddProductDrawer";
 interface Tab {
   name: string;
   searchParam: string;
@@ -44,6 +45,8 @@ function isActiveTab(
 
 export default function Products() {
   const categorySearchParam = useSearchParams().get("category");
+  const params = new URLSearchParams(useSearchParams());
+  const router = useRouter();
   const { data: products, error } = useGetProductsByProductCategoryID(
     categorySearchParam ?? "all"
   );
@@ -55,7 +58,10 @@ export default function Products() {
     <div>
       <PageHeaderWithAction
         title="Products"
-        action={() => {}}
+        action={() => {
+          params.set("addProduct", "true");
+          router.push(`/dashboard/products?${params.toString()}`);
+        }}
         actionText="Add new product"
       />
       <Tabs />
@@ -71,6 +77,7 @@ export default function Products() {
           </li>
         ))}
       </ul>
+      <AddProductDrawer />
     </div>
   );
 }

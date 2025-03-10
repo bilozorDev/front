@@ -34,6 +34,7 @@ export default function AddClientDrawer() {
   const { isActive, handleToggle } = useQueryParamsToggle({
     paramsName: "addClient",
   });
+  const { mutate: createClient, isPending, error } = useCreateClient();
 
   const form = useForm({
     defaultValues: {
@@ -56,7 +57,6 @@ export default function AddClientDrawer() {
       });
     },
   });
-  const { mutate: createClient, isPending, error } = useCreateClient();
   const handleClose = () => {
     handleToggle();
   };

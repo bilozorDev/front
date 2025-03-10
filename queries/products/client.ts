@@ -1,7 +1,7 @@
+import { Product } from "@/types/types.t";
 import { Database } from "@/types/supabase";
 import { createClient } from "@/utils/supabase/client";
-import { QueryData } from "@supabase/supabase-js";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 //get product categories
 const getProductCategories = async () => {
   const supabase = createClient();
@@ -75,6 +75,26 @@ export const useGetProductsByProductCategoryID = (categoryId: string) => {
       const data = await getProductsByProductCategoryID(categoryId);
       if (!data) return [];
       return data as unknown as ProductWithCategory[];
+    },
+  });
+};
+
+//create product
+const createProduct = async (product: Product) => {
+  const supabase = createClient();
+  const { data, error } = await supabase.from("products").insert(product);
+  return data;
+};
+
+export const useCreateProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+    onError: (error) => {
+      console.error(error);
     },
   });
 };
