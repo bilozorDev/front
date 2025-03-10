@@ -1,15 +1,15 @@
 "use client";
-import { getProductsServer } from "@/queries/products/server";
-import { Product } from "@/types/types.t";
-import { Fragment } from "react";
+import { ProductCategory } from "@/types/types.t";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import {
   BuildingOfficeIcon,
   CreditCardIcon,
   UserIcon,
-  UsersIcon,
 } from "@heroicons/react/20/solid";
-import { useGetAllProducts } from "@/queries/products/client";
+import {
+  useGetProductCategories,
+  useGetProductsByProductCategoryID,
+} from "@/queries/products/client";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface Tab {
@@ -18,138 +18,163 @@ interface Tab {
   icon: React.ElementType;
 }
 
-const tabs: Tab[] = [
-  { name: "All", searchParam: "all", icon: UserIcon },
-  {
-    name: "Computers and laptops",
-    searchParam: "computers-and-laptops",
-    icon: BuildingOfficeIcon,
-  },
-  { name: "Peripherals", searchParam: "peripherals", icon: UsersIcon },
-  { name: "Networking", searchParam: "networking", icon: UsersIcon },
-  { name: "Services", searchParam: "services", icon: CreditCardIcon },
-  { name: "Other", searchParam: "other", icon: CreditCardIcon },
-];
-
-function transformApiDataToTableFormat(apiData: Product[]): {
-  categoryName: string;
-  products: Product[];
-}[] {
-  // Group products by category
-  const groupedByCategory: { [category: string]: Product[] } = {};
-
-  // Iterate through all products
-  apiData.forEach((product) => {
-    const category = product.category;
-
-    // Initialize category array if it doesn't exist
-    if (!groupedByCategory[category ?? ""]) {
-      groupedByCategory[category ?? ""] = [];
-    }
-
-    // Add product to its category group
-    groupedByCategory[category ?? ""].push(product);
-  });
-
-  // Convert the grouped object into the expected array format
-  const tableData = Object.keys(groupedByCategory).map((categoryName) => ({
-    categoryName,
-    products: groupedByCategory[categoryName],
-  }));
-
-  // Sort categories alphabetically
-  return tableData.sort((a, b) => a.categoryName.localeCompare(b.categoryName));
-}
-
-function isActiveTab(tab: Tab, currentCategory: string | null): boolean {
+function isActiveTab(
+  category: ProductCategory,
+  currentCategory: string | null
+): boolean {
   // If no category is selected (null or empty) and this is the "All" tab
-  if (
-    (!currentCategory || currentCategory === "") &&
-    tab.searchParam === "all"
-  ) {
+  if ((!currentCategory || currentCategory === "") && category.slug === "all") {
     return true;
   }
 
   // Otherwise, check if the tab's searchParam matches the current category
-  return tab.searchParam === currentCategory;
+  return category.slug === currentCategory;
 }
 
 export default function Products() {
-  const { data, error } = useGetAllProducts();
+  const categorySearchParam = useSearchParams().get("category");
+  const { data: products, error } =
+    useGetProductsByProductCategoryID(categorySearchParam ?? "all");
   if (error) {
     console.error(error);
   }
-  console.log(data);
-  if (data?.length === 0) {
-    return <div>No products found</div>;
-  }
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const handleTabChange = (tab: Tab) => {
-    router.push(`/dashboard/products?category=${tab.searchParam}`);
-  };
-
+  console.log(products);
   return (
     <div>
       <h1>Products</h1>
-      <div className="mb-5">
-        <div className="grid grid-cols-1 sm:hidden">
-          <select
-            defaultValue={tabs[0].searchParam}
-            aria-label="Select a tab"
-            className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-2 pl-3 pr-8 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
-          >
-            {tabs.map((tab) => (
-              <option key={tab.name} value={tab.searchParam}>
-                {tab.name}
-              </option>
-            ))}
-          </select>
-          <ChevronDownIcon
-            aria-hidden="true"
-            className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end fill-gray-500"
-          />
-        </div>
-        <div className="hidden sm:block">
-          <div className="border-b border-gray-200">
-            <nav aria-label="Tabs" className="-mb-px flex space-x-8">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.name}
-                  onClick={() => handleTabChange(tab)}
-                  aria-current={
-                    isActiveTab(tab, searchParams.get("category"))
-                      ? "page"
-                      : undefined
-                  }
-                  className={classNames(
-                    isActiveTab(tab, searchParams.get("category"))
-                      ? "border-indigo-500 text-indigo-600"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                    "group inline-flex items-center border-b-2 px-1 py-4 text-sm font-medium"
-                  )}
-                >
-                  <tab.icon
-                    aria-hidden="true"
-                    className={classNames(
-                      isActiveTab(tab, searchParams.get("category"))
-                        ? "text-indigo-500"
-                        : "text-gray-400 group-hover:text-gray-500",
-                      "-ml-0.5 mr-2 size-5"
-                    )}
-                  />
-                  <span>{tab.name}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
-        </div>
-      </div>
-
+      <Tabs />
+      {/* {data?.length === 0 && <div>No products found</div>} */}
       {/* <ProductsTable data={data ?? []} /> */}
     </div>
   );
 }
+
+function Tabs() {
+  const { data: productCategories, error } = useGetProductCategories();
+  const router = useRouter();
+  const categorySearchParam = useSearchParams().get("category");
+  const handleTabChange = (category: ProductCategory) => {
+    router.push(`/dashboard/products?category=${category.id}`);
+  };
+  if (error) {
+    console.error(error);
+  }
+  if (productCategories?.length === 0) {
+    return "No product categories found";
+  }
+  return (
+    <div className="mb-5">
+      <div className="grid grid-cols-1 sm:hidden">
+        <select
+          defaultValue="All"
+          aria-label="Select a tab"
+          className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-2 pl-3 pr-8 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
+        >
+          {productCategories?.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+        <ChevronDownIcon
+          aria-hidden="true"
+          className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end fill-gray-500"
+        />
+      </div>
+      <div className="hidden sm:block">
+        <div className="border-b border-gray-200">
+          <nav aria-label="Tabs" className="-mb-px flex space-x-8">
+            {/* All */}
+            <button
+              onClick={() =>
+                handleTabChange({
+                  id: "all",
+                  name: "All",
+                  slug: "all",
+                  created_at: new Date().toISOString(),
+                })
+              }
+              aria-current={
+                isActiveTab(
+                  {
+                    id: "all",
+                    name: "All",
+                    slug: "all",
+                    created_at: new Date().toISOString(),
+                  },
+                  categorySearchParam
+                )
+                  ? "page"
+                  : undefined
+              }
+              className={classNames(
+                isActiveTab(
+                  {
+                    id: "all",
+                    name: "All",
+                    slug: "all",
+                    created_at: new Date().toISOString(),
+                  },
+                  categorySearchParam
+                )
+                  ? "border-indigo-500 text-indigo-600"
+                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                "group inline-flex items-center border-b-2 px-1 py-4 text-sm font-medium capitalize"
+              )}
+            >
+              <CategoryIcon
+                category={{
+                  id: "all",
+                  name: "All",
+                  slug: "all",
+                  created_at: new Date().toISOString(),
+                }}
+              />
+              <span>All</span>
+            </button>
+            {productCategories?.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => handleTabChange(category)}
+                aria-current={
+                  isActiveTab(category, categorySearchParam)
+                    ? "page"
+                    : undefined
+                }
+                className={classNames(
+                  isActiveTab(category, categorySearchParam)
+                    ? "border-indigo-500 text-indigo-600"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                  "group inline-flex items-center border-b-2 px-1 py-4 text-sm font-medium capitalize"
+                )}
+              >
+                <CategoryIcon category={category} />
+                <span>{category.name}</span>
+              </button>
+            ))}
+          </nav>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const CategoryIcon = ({ category }: { category: ProductCategory }) => {
+  switch (category.slug) {
+    case "all":
+      return <BuildingOfficeIcon className="mr-2 size-5" />;
+    case "computers-and-laptops":
+      return <BuildingOfficeIcon className="mr-2 size-5" />;
+    case "peripherals":
+      return <UserIcon className="mr-2 size-5" />;
+    case "networking":
+      return <UserIcon className="mr-2 size-5" />;
+    case "services":
+      return <CreditCardIcon className="mr-2 size-5" />;
+    default:
+      return <UserIcon className="mr-2 size-5" />;
+  }
+};
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
