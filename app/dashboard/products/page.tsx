@@ -23,18 +23,19 @@ function isActiveTab(
   currentCategory: string | null
 ): boolean {
   // If no category is selected (null or empty) and this is the "All" tab
-  if ((!currentCategory || currentCategory === "") && category.slug === "all") {
+  if ((!currentCategory || currentCategory === "") && category.id === "all") {
     return true;
   }
 
   // Otherwise, check if the tab's searchParam matches the current category
-  return category.slug === currentCategory;
+  return category.id === currentCategory;
 }
 
 export default function Products() {
   const categorySearchParam = useSearchParams().get("category");
-  const { data: products, error } =
-    useGetProductsByProductCategoryID(categorySearchParam ?? "all");
+  const { data: products, error } = useGetProductsByProductCategoryID(
+    categorySearchParam ?? "all"
+  );
   if (error) {
     console.error(error);
   }

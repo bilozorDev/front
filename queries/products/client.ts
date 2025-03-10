@@ -18,7 +18,6 @@ export const useGetProductCategories = () => {
 const getProductsByProductCategoryID = async (categoryId: string) => {
   const supabase = createClient();
   if (!categoryId || categoryId === "all") {
-    console.log("No category ID provided");
     const { data, error } = await supabase.from("products").select("*");
     if (error) {
       throw error;
