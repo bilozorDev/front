@@ -5,3 +5,10 @@
 .header-title {
   @apply text-2xl font-bold flex items-center gap-2;
 }
+@layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}

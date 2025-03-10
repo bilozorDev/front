@@ -51,6 +51,7 @@ CREATE TABLE
         name TEXT NOT NULL,
         category_id UUID NOT NULL REFERENCES "public"."product_category" ("id"),
         cost DECIMAL(10, 2),
+        link_to_product TEXT,
         purchase_date DATE,
         vendor TEXT,
         price_to_client DECIMAL(10, 2),

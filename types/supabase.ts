@@ -94,6 +94,7 @@ export type Database = {
           id: string
           image_url: string | null
           last_updated: string | null
+          link_to_product: string | null
           min_stock_level: number | null
           name: string
           notes: string | null
@@ -115,6 +116,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           last_updated?: string | null
+          link_to_product?: string | null
           min_stock_level?: number | null
           name: string
           notes?: string | null
@@ -136,6 +138,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           last_updated?: string | null
+          link_to_product?: string | null
           min_stock_level?: number | null
           name?: string
           notes?: string | null
