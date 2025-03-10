@@ -1,4 +1,6 @@
+import { Database } from "@/types/supabase";
 import { createClient } from "@/utils/supabase/client";
+import { QueryData } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 //get product categories
 const getProductCategories = async () => {
@@ -14,11 +16,32 @@ export const useGetProductCategories = () => {
   });
 };
 
+export type ProductWithCategory =
+  Database["public"]["Tables"]["products"]["Row"] & {
+    product_category: Pick<
+      Database["public"]["Tables"]["product_category"]["Row"],
+      "name" | "slug"
+    >;
+  };
+
 //get all products by product-category slug
 const getProductsByProductCategoryID = async (categoryId: string) => {
   const supabase = createClient();
   if (!categoryId || categoryId === "all") {
-    const { data, error } = await supabase.from("products").select("*");
+    const { data, error } = await supabase.from("products").select(
+      `
+      id,
+      name,
+      cost,
+      price_to_client,
+      qty,
+      description,
+      image_url,
+      status,
+      vendor,
+      product_category(name, slug)
+    `
+    );
     if (error) {
       throw error;
     }
@@ -46,8 +69,12 @@ const getProductsByProductCategoryID = async (categoryId: string) => {
 };
 
 export const useGetProductsByProductCategoryID = (categoryId: string) => {
-  return useQuery({
+  return useQuery<ProductWithCategory[], Error, ProductWithCategory[]>({
     queryKey: ["products-by-product-category-id", categoryId],
-    queryFn: () => getProductsByProductCategoryID(categoryId),
+    queryFn: async () => {
+      const data = await getProductsByProductCategoryID(categoryId);
+      if (!data) return [];
+      return data as unknown as ProductWithCategory[];
+    },
   });
 };

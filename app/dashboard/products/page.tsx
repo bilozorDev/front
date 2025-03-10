@@ -1,16 +1,21 @@
 "use client";
-import { ProductCategory } from "@/types/types.t";
+import { Product, ProductCategory } from "@/types/types.t";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import {
   BuildingOfficeIcon,
+  ChevronRightIcon,
+  ComputerDesktopIcon,
   CreditCardIcon,
   UserIcon,
 } from "@heroicons/react/20/solid";
 import {
+  ProductWithCategory,
   useGetProductCategories,
   useGetProductsByProductCategoryID,
 } from "@/queries/products/client";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { EllipsisHorizontalIcon } from "@heroicons/react/20/solid";
 
 interface Tab {
   name: string;
@@ -44,8 +49,18 @@ export default function Products() {
     <div>
       <h1>Products</h1>
       <Tabs />
-      {/* {data?.length === 0 && <div>No products found</div>} */}
-      {/* <ProductsTable data={data ?? []} /> */}
+      {products?.length === 0 && <div>No products found</div>}
+
+      <ul
+        role="list"
+        className="divide-y divide-gray-100 overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl"
+      >
+        {products?.map((product) => (
+          <li key={product.id}>
+            <ProductCard product={product} />
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -177,118 +192,115 @@ const CategoryIcon = ({ category }: { category: ProductCategory }) => {
   }
 };
 
+const statuses = {
+  Paid: "text-green-700 bg-green-50 ring-green-600/20",
+  Withdraw: "text-gray-600 bg-gray-50 ring-gray-500/10",
+  Overdue: "text-red-700 bg-red-50 ring-red-600/10",
+};
+const clients = [
+  {
+    id: 1,
+    name: "Tuple",
+    imageUrl: "https://tailwindcss.com/plus-assets/img/logos/48x48/tuple.svg",
+    lastInvoice: {
+      date: "December 13, 2022",
+      dateTime: "2022-12-13",
+      amount: "$2,000.00",
+      status: "Overdue",
+    },
+  },
+  {
+    id: 2,
+    name: "SavvyCal",
+    imageUrl:
+      "https://tailwindcss.com/plus-assets/img/logos/48x48/savvycal.svg",
+    lastInvoice: {
+      date: "January 22, 2023",
+      dateTime: "2023-01-22",
+      amount: "$14,000.00",
+      status: "Paid",
+    },
+  },
+  {
+    id: 3,
+    name: "Reform",
+    imageUrl: "https://tailwindcss.com/plus-assets/img/logos/48x48/reform.svg",
+    lastInvoice: {
+      date: "January 23, 2023",
+      dateTime: "2023-01-23",
+      amount: "$7,600.00",
+      status: "Paid",
+    },
+  },
+];
+
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-// export function ProductsTable({ data }: { data: Product[] }) {
-//   const tableData = transformApiDataToTableFormat(data);
-//   return (
-//     <div className="px-4 sm:px-6 lg:px-8">
-//       <div className="sm:flex sm:items-center">
-//         <div className="sm:flex-auto">
-//           <h1 className="text-base font-semibold text-gray-900">Users</h1>
-//           <p className="mt-2 text-sm text-gray-700">
-//             A list of all the users in your account including their name, title,
-//             email and role.
-//           </p>
-//         </div>
-//         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-//           <button
-//             type="button"
-//             className="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-//           >
-//             Add user
-//           </button>
-//         </div>
-//       </div>
-//       <div className="mt-8 flow-root">
-//         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-//           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-//             <table className="min-w-full">
-//               <thead className="bg-white">
-//                 <tr>
-//                   <th
-//                     scope="col"
-//                     className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
-//                   >
-//                     Name
-//                   </th>
-//                   <th
-//                     scope="col"
-//                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-//                   >
-//                     Title
-//                   </th>
-//                   <th
-//                     scope="col"
-//                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-//                   >
-//                     Email
-//                   </th>
-//                   <th
-//                     scope="col"
-//                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-//                   >
-//                     Role
-//                   </th>
-//                   <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-3">
-//                     <span className="sr-only">Edit</span>
-//                   </th>
-//                 </tr>
-//               </thead>
-//               <tbody className="bg-white">
-//                 {tableData.map((location) => (
-//                   <Fragment key={location.categoryName}>
-//                     <tr className="border-t border-gray-200">
-//                       <th
-//                         scope="colgroup"
-//                         colSpan={5}
-//                         className="bg-gray-50 py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3"
-//                       >
-//                         {location.categoryName}
-//                       </th>
-//                     </tr>
-//                     {location.products.map((product, productIdx) => (
-//                       <tr
-//                         key={product.id}
-//                         className={classNames(
-//                           productIdx === 0
-//                             ? "border-gray-300"
-//                             : "border-gray-200",
-//                           "border-t"
-//                         )}
-//                       >
-//                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-3">
-//                           {product.name}
-//                         </td>
-//                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-//                           {product.description}
-//                         </td>
-//                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-//                           {product.cost}
-//                         </td>
-//                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-//                           {product.category}
-//                         </td>
-//                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-3">
-//                           <a
-//                             href="#"
-//                             className="text-indigo-600 hover:text-indigo-900"
-//                           >
-//                             Edit
-//                             <span className="sr-only">, {product.name}</span>
-//                           </a>
-//                         </td>
-//                       </tr>
-//                     ))}
-//                   </Fragment>
-//                 ))}
-//               </tbody>
-//             </table>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
+export function ProductCard({ product }: { product: Product }) {
+  return (
+    <div className="relative flex justify-between gap-x-6 px-4 py-5 hover:bg-gray-50 sm:px-6">
+      <div className="flex min-w-0 gap-x-4">
+        <ImageUrl product={product} />
+        <div className="min-w-0 flex-auto">
+          <p className="text-sm/6 font-semibold text-gray-900">
+            <a href={product.href}>
+              <span className="absolute inset-x-0 -top-px bottom-0" />
+              {product.name}
+            </a>
+          </p>
+          <p className="mt-1 flex text-xs/5 text-gray-500">
+            <a
+              href={`mailto:${product.email}`}
+              className="relative truncate hover:underline"
+            >
+              {product.email}
+            </a>
+          </p>
+        </div>
+      </div>
+      <div className="flex shrink-0 items-center gap-x-4">
+        <div className="hidden sm:flex sm:flex-col sm:items-end">
+          <p className="text-sm/6 text-gray-900">{product.vendor}</p>
+          {product.last_updated ? (
+            <p className="mt-1 text-xs/5 text-gray-500">
+              Last seen{" "}
+              <time dateTime={product.last_updated}>
+                {product.last_updated}
+              </time>
+            </p>
+          ) : (
+            <div className="mt-1 flex items-center gap-x-1.5">
+              <div className="flex-none rounded-full bg-emerald-500/20 p-1">
+                <div className="size-1.5 rounded-full bg-emerald-500" />
+              </div>
+              <p className="text-xs/5 text-gray-500">Online</p>
+            </div>
+          )}
+        </div>
+        <ChevronRightIcon
+          aria-hidden="true"
+          className="size-5 flex-none text-gray-400"
+        />
+      </div>
+    </div>
+  );
+}
+
+const ImageUrl = ({ product }: { product: ProductWithCategory }) => {
+  if (!product.product_category) return product.image_url;
+  if (product.product_category.slug === "computers-and-laptops") {
+    return <ComputerDesktopIcon className="mr-2 size-5" />;
+  }
+  if (product.product_category.slug === "peripherals") {
+    return <UserIcon className="mr-2 size-5" />;
+  }
+  if (product.product_category.slug === "networking") {
+    return <UserIcon className="mr-2 size-5" />;
+  }
+  if (product.product_category.slug === "services") {
+    return <UserIcon className="mr-2 size-5" />;
+  }
+  return <UserIcon className="mr-2 size-5" />;
+};
