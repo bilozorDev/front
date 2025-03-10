@@ -1,10 +1,16 @@
+-- Product categories reference:
+-- 'computers and laptops' = '426e7704-cf2d-4321-b49a-5bd154411f3e'
+-- 'peripherals' = '11974528-03d1-4040-ac95-d2c134622334'
+-- 'networking' = '69f0b99f-fde4-486f-8d4a-be816dd02621'
+-- 'services' = 'b734813a-af22-47e6-b105-8fdf1b4d1f80'
+-- 'other' = '362c12ad-fe97-42cc-8bb0-89fe80311c73'
 -- Add IT products for John
 INSERT INTO
     products (
         id,
         user_id,
         name,
-        category,
+        category_id,
         cost,
         purchase_date,
         vendor,
@@ -21,7 +27,7 @@ VALUES
         uuid_generate_v4 (),
         'a1b2c3d4-e5f6-47a7-b8c9-1a2b3c4d5e6f',
         'Lenovo ThinkPad X1 Carbon',
-        'Laptops',
+        '426e7704-cf2d-4321-b49a-5bd154411f3e', -- Computers and laptops
         999.00,
         now () - interval '60 days',
         'Lenovo Group Ltd.',
@@ -37,7 +43,7 @@ VALUES
         uuid_generate_v4 (),
         'a1b2c3d4-e5f6-47a7-b8c9-1a2b3c4d5e6f',
         'Microsoft 365 Business Premium',
-        'Software',
+        '362c12ad-fe97-42cc-8bb0-89fe80311c73', -- Other
         16.50,
         now () - interval '45 days',
         'Microsoft Corporation',
@@ -53,7 +59,7 @@ VALUES
         uuid_generate_v4 (),
         'a1b2c3d4-e5f6-47a7-b8c9-1a2b3c4d5e6f',
         'Logitech MX Master 3 Mouse',
-        'Peripherals',
+        '11974528-03d1-4040-ac95-d2c134622334', -- Peripherals
         69.99,
         now () - interval '30 days',
         'Logitech',
@@ -72,7 +78,7 @@ INSERT INTO
         id,
         user_id,
         name,
-        category,
+        category_id,
         cost,
         purchase_date,
         vendor,
@@ -90,7 +96,7 @@ VALUES
         uuid_generate_v4 (),
         'b2c3d4e5-f6a7-48b8-c9d0-2a3b4c5d6e7f',
         'Dell XPS 15 Workstation',
-        'Laptops',
+        '426e7704-cf2d-4321-b49a-5bd154411f3e', -- Computers and laptops
         1350.00,
         now () - interval '90 days',
         'Dell Inc.',
@@ -107,7 +113,7 @@ VALUES
         uuid_generate_v4 (),
         'b2c3d4e5-f6a7-48b8-c9d0-2a3b4c5d6e7f',
         'HP EliteDesk 800 G6',
-        'Desktops',
+        '426e7704-cf2d-4321-b49a-5bd154411f3e', -- Computers and laptops
         650.00,
         now () - interval '85 days',
         'HP Inc.',
@@ -124,7 +130,7 @@ VALUES
         uuid_generate_v4 (),
         'b2c3d4e5-f6a7-48b8-c9d0-2a3b4c5d6e7f',
         'LG 27" UltraFine 4K Monitor',
-        'Monitors',
+        '11974528-03d1-4040-ac95-d2c134622334', -- Peripherals
         399.00,
         now () - interval '70 days',
         'LG Electronics',
@@ -141,7 +147,7 @@ VALUES
         uuid_generate_v4 (),
         'b2c3d4e5-f6a7-48b8-c9d0-2a3b4c5d6e7f',
         'Jabra Evolve 75 Headset',
-        'Peripherals',
+        '11974528-03d1-4040-ac95-d2c134622334', -- Peripherals
         179.00,
         now () - interval '60 days',
         'Jabra',
@@ -158,7 +164,7 @@ VALUES
         uuid_generate_v4 (),
         'b2c3d4e5-f6a7-48b8-c9d0-2a3b4c5d6e7f',
         'NetApp FAS2750 Storage Array',
-        'Storage',
+        '362c12ad-fe97-42cc-8bb0-89fe80311c73', -- Other
         7500.00,
         now () - interval '40 days',
         'NetApp Inc.',
@@ -178,7 +184,7 @@ INSERT INTO
         id,
         user_id,
         name,
-        category,
+        category_id,
         cost,
         purchase_date,
         vendor,
@@ -196,7 +202,7 @@ VALUES
         uuid_generate_v4 (),
         'c3d4e5f6-a7b8-49c9-d0e1-3a4b5c6d7e8f',
         'Managed IT Support - Standard',
-        'IT Services',
+        'b734813a-af22-47e6-b105-8fdf1b4d1f80', -- Services
         0.00,
         now () - interval '30 days',
         'Internal',
@@ -213,7 +219,7 @@ VALUES
         uuid_generate_v4 (),
         'c3d4e5f6-a7b8-49c9-d0e1-3a4b5c6d7e8f',
         'Security Audit & Assessment',
-        'IT Services',
+        'b734813a-af22-47e6-b105-8fdf1b4d1f80', -- Services
         0.00,
         now () - interval '30 days',
         'Internal',
@@ -230,7 +236,7 @@ VALUES
         uuid_generate_v4 (),
         'c3d4e5f6-a7b8-49c9-d0e1-3a4b5c6d7e8f',
         'Cisco Meraki MX68 Firewall',
-        'Network Security',
+        '69f0b99f-fde4-486f-8d4a-be816dd02621', -- Networking
         550.00,
         now () - interval '45 days',
         'Cisco Systems',
@@ -247,7 +253,7 @@ VALUES
         uuid_generate_v4 (),
         'c3d4e5f6-a7b8-49c9-d0e1-3a4b5c6d7e8f',
         'Dell UltraSharp 32" 4K Monitor',
-        'Monitors',
+        '11974528-03d1-4040-ac95-d2c134622334', -- Peripherals
         649.00,
         now () - interval '40 days',
         'Dell Inc.',
@@ -264,7 +270,7 @@ VALUES
         uuid_generate_v4 (),
         'c3d4e5f6-a7b8-49c9-d0e1-3a4b5c6d7e8f',
         'Acronis Cyber Protect Cloud',
-        'Backup & Recovery',
+        '362c12ad-fe97-42cc-8bb0-89fe80311c73', -- Other
         10.99,
         now () - interval '25 days',
         'Acronis International',
@@ -281,7 +287,7 @@ VALUES
         uuid_generate_v4 (),
         'c3d4e5f6-a7b8-49c9-d0e1-3a4b5c6d7e8f',
         'HP Z4 G4 Workstation',
-        'Workstations',
+        '426e7704-cf2d-4321-b49a-5bd154411f3e', -- Computers and laptops
         1899.00,
         now () - interval '20 days',
         'HP Inc.',
@@ -293,4 +299,21 @@ VALUES
         'active',
         8.25,
         now () - interval '19 days'
+    ),
+    (
+        uuid_generate_v4 (),
+        'c3d4e5f6-a7b8-49c9-d0e1-3a4b5c6d7e8f',
+        'Ubiquiti UniFi Switch Pro 24 PoE',
+        '69f0b99f-fde4-486f-8d4a-be816dd02621', -- Networking
+        699.00,
+        now () - interval '15 days',
+        'Ubiquiti Inc.',
+        999.99,
+        4,
+        'Enterprise-grade network switch',
+        'MRK-NET-007',
+        '24-port Gigabit PoE+ managed switch with SFP+ ports, Layer 3 features',
+        'active',
+        8.25,
+        now () - interval '14 days'
     );

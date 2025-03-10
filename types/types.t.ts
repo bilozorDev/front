@@ -16,21 +16,10 @@ export type Quote = Tables<"quotes">;
 export type QuoteInsert = TablesInsert<"quotes">;
 export type QuoteUpdate = TablesUpdate<"quotes">;
 
-type ProductCategory = "Hardware" | "Software" | "Services";
-type ProductHardwareSubCategory =
-  | "Desktops"
-  | "Laptops"
-  | "Tablets"
-  | "Phones"
-  | "Monitors"
-  | "Printers"
-  | "Scanners"
-  | "Projectors"
-  | "Audio"
-  | "Video"
-  | "Storage"
-  | "Networking"
-  | "Security";
+// Product category types
+export type ProductCategory = Tables<"product_category">;
+export type ProductCategoryInsert = TablesInsert<"product_category">;
+export type ProductCategoryUpdate = TablesUpdate<"product_category">;
 
 export interface AddProductSearchProps {
   open: boolean;

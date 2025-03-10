@@ -64,9 +64,30 @@ export type Database = {
         }
         Relationships: []
       }
+      product_category: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
-          category: string | null
+          category_id: string
           cost: number | null
           created_at: string | null
           description: string | null
@@ -87,7 +108,7 @@ export type Database = {
           vendor: string | null
         }
         Insert: {
-          category?: string | null
+          category_id: string
           cost?: number | null
           created_at?: string | null
           description?: string | null
@@ -108,7 +129,7 @@ export type Database = {
           vendor?: string | null
         }
         Update: {
-          category?: string | null
+          category_id?: string
           cost?: number | null
           created_at?: string | null
           description?: string | null
@@ -128,7 +149,15 @@ export type Database = {
           user_id?: string
           vendor?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "product_category"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quotes: {
         Row: {
