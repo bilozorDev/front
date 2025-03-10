@@ -5,7 +5,7 @@ import { createClient as createServerClient } from "@/utils/supabase/server";
 
 // get clients server side
 export const getClientsServer = async () => {
-  const supabase = await createServerClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.from("clients").select("*");
   return { data: data as Client[], error };
 };
