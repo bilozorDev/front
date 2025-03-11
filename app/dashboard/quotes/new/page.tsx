@@ -197,39 +197,24 @@ const ClientInfoHeader = () => {
   const { data: client } = useGetClientById(clientId as string);
   const [openChangeClientModal, setOpenChangeClientModal] = useState(false);
   if (!client?.data) {
-    return <div>Client not found</div>;
+    return (
+      <>
+        <button
+          onClick={() => setOpenChangeClientModal(true)}
+          className="text-sm font-medium text-gray-500 hover:text-gray-700 border border-gray-300 rounded-md px-2 py-1"
+        >
+          Select Client
+        </button>
+        <ChangeClientModal
+          openChangeClientModal={openChangeClientModal}
+          setOpenChangeClientModal={setOpenChangeClientModal}
+        />
+      </>
+    );
   }
   return (
     <div className="lg:flex lg:items-center lg:justify-between">
       <div className="min-w-0 flex-1">
-        {/* <nav aria-label="Breadcrumb" className="flex">
-          <ol role="list" className="flex items-center space-x-4">
-            <li>
-              <div className="flex">
-                <Link
-                  href="/dashboard/clients"
-                  className="text-sm font-medium text-gray-500 hover:text-gray-700"
-                >
-                  Clients
-                </Link>
-              </div>
-            </li>
-            <li>
-              <div className="flex items-center">
-                <ChevronRightIcon
-                  aria-hidden="true"
-                  className="size-5 shrink-0 text-gray-400"
-                />
-                <a
-                  href="#"
-                  className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
-                >
-                  {client?.data.name}
-                </a>
-              </div>
-            </li>
-          </ol>
-        </nav> */}
         <div className="flex items-center gap-x-4">
           <h2 className="text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
             {client?.data.name}
@@ -330,9 +315,10 @@ const ChangeClientModal = ({
                             ) as Client
                           );
                         }}
-                        defaultValue={clientId as string}
+                        defaultValue={clientId as string || ""}
                         className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                       >
+                        <option value="">Select Client</option>
                         {clients?.data?.map((client) => (
                           <option key={client.id} value={client.id}>
                             {client.name}
