@@ -35,6 +35,25 @@ export const useGetClients = () => {
   });
 };
 
+// get client by id client side
+export const getClientById = async (id: string) => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("clients")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  return { data: data as Client, error };
+};
+
+export const useGetClientById = (id: string) => {
+  return useQuery({
+    queryKey: ["client", id],
+    queryFn: () => getClientById(id),
+    enabled: !!id,
+  });
+};
+
 // add client with existence check
 const addClient = async (client: ClientInsert) => {
   const supabase = createClient();

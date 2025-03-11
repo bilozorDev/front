@@ -2,13 +2,12 @@
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import { useAddQuote } from "@/queries/addQuote";
 import PageHeaderWithAction from "@/components/PageHeaderWithAction";
+import { useRouter } from "next/navigation";
 export default function Quotes() {
-  const { createQuote } = useAddQuote();
-
+  const router = useRouter();
   const handleCreateQuote = () => {
-    createQuote.mutate();
+    router.push("/dashboard/quotes/new");
   };
   return (
     <>
