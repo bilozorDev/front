@@ -83,6 +83,7 @@ export const useGetProductsByProductCategoryID = (categoryId: string) => {
 const createProduct = async (product: ProductInsert) => {
   const supabase = createClient();
   const { data, error } = await supabase.from("products").insert(product);
+  if (error) throw error;
   return data;
 };
 
@@ -102,8 +103,6 @@ export const useCreateProduct = () => {
   });
 };
 
-
-
 // get all products
 const getProducts = async () => {
   const supabase = createClient();
@@ -114,9 +113,10 @@ const getProducts = async () => {
     image_url,
     qty,
     description,
+    price_to_client,
     product_category(name, slug)
     `
-  );
+  ).order("qty", { ascending: false });
   return data as unknown as ProductWithCategory[];
 };
 
