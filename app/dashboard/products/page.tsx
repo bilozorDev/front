@@ -14,8 +14,6 @@ import {
   useGetProductsByProductCategoryID,
 } from "@/queries/products/client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { EllipsisHorizontalIcon } from "@heroicons/react/20/solid";
 import {
   ChartBarIcon,
   ChartPieIcon,
@@ -209,48 +207,6 @@ const CategoryIcon = ({ category }: { category: ProductCategory }) => {
   }
 };
 
-const statuses = {
-  Paid: "text-green-700 bg-green-50 ring-green-600/20",
-  Withdraw: "text-gray-600 bg-gray-50 ring-gray-500/10",
-  Overdue: "text-red-700 bg-red-50 ring-red-600/10",
-};
-const clients = [
-  {
-    id: 1,
-    name: "Tuple",
-    imageUrl: "https://tailwindcss.com/plus-assets/img/logos/48x48/tuple.svg",
-    lastInvoice: {
-      date: "December 13, 2022",
-      dateTime: "2022-12-13",
-      amount: "$2,000.00",
-      status: "Overdue",
-    },
-  },
-  {
-    id: 2,
-    name: "SavvyCal",
-    imageUrl:
-      "https://tailwindcss.com/plus-assets/img/logos/48x48/savvycal.svg",
-    lastInvoice: {
-      date: "January 22, 2023",
-      dateTime: "2023-01-22",
-      amount: "$14,000.00",
-      status: "Paid",
-    },
-  },
-  {
-    id: 3,
-    name: "Reform",
-    imageUrl: "https://tailwindcss.com/plus-assets/img/logos/48x48/reform.svg",
-    lastInvoice: {
-      date: "January 23, 2023",
-      dateTime: "2023-01-23",
-      amount: "$7,600.00",
-      status: "Paid",
-    },
-  },
-];
-
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
@@ -275,35 +231,25 @@ export function ProductCard({ product }: { product: Product }) {
               </button>
             </p>
             <p className="mt-1 flex text-xs/5 text-gray-500">
-              <a
-                href={`mailto:${product.email}`}
-                className="relative truncate hover:underline"
-              >
-                {product.email}
-              </a>
+              {product.description}
+            </p>
+            <p className="mt-1 flex text-xs text-gray-500">
+              {product.created_at}
             </p>
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-x-4">
           <div className="hidden sm:flex sm:flex-col sm:items-end">
             <p className="text-sm/6 text-gray-900">{product.vendor}</p>
-            {product.last_updated ? (
-              <p className="mt-1 text-xs/5 text-gray-500">
-                Last seen{" "}
-                <time dateTime={product.last_updated}>
-                  {product.last_updated}
-                </time>
-              </p>
-            ) : (
-              <div className="mt-1 flex items-center gap-x-1.5">
-                <div className="flex-none rounded-full bg-emerald-500/20 p-1">
-                  <div className="size-1.5 rounded-full bg-emerald-500" />
-                </div>
-                <p className="text-xs/5 text-gray-500">
-                  {product.qty} in stock
-                </p>
-              </div>
-            )}
+            <p
+              className={`text-sm/6 ${
+                product.qty && product.qty > 0
+                  ? "text-gray-700"
+                  : "text-red-500"
+              }`}
+            >
+              {product.qty} in stock
+            </p>
           </div>
           <ChevronRightIcon
             aria-hidden="true"
