@@ -36,7 +36,8 @@ export default function AddProductDrawer() {
       vendor: "Dell",
       cost: 1000.99,
       price_to_client: 1200.99,
-      link_to_product: "https://www.dell.com",
+      qty: 1,
+      link_to_product: "www.dell.com",
       description: "Dell XPS 13 laptop",
     } as ProductInsert,
     onSubmit: async ({ value }) => {
@@ -263,6 +264,34 @@ export default function AddProductDrawer() {
                             </div>
                           )}
                         </form.Field>
+
+                        <form.Field name="qty">
+                          {({ state, handleChange, handleBlur }) => (
+                            <div>
+                              <label
+                                htmlFor="quantity"
+                                className="block text-sm/6 font-medium text-gray-900"
+                              >
+                                Quantity
+                              </label>
+                              <div className="mt-2">
+                                <input
+                                  id="quantity"
+                                  name="quantity"
+                                  value={state.value ?? ""}
+                                  onChange={(e) =>
+                                    handleChange(Number(e.target.value))
+                                  }
+                                  onBlur={handleBlur}
+                                  type="number"
+                                  placeholder="0"
+                                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </form.Field>
+
                         <form.Field name="link_to_product">
                           {({ state, handleChange, handleBlur }) => (
                             <div>
