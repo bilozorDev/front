@@ -101,3 +101,28 @@ export const useCreateProduct = () => {
     },
   });
 };
+
+
+
+// get all products
+const getProducts = async () => {
+  const supabase = createClient();
+  const { data, error } = await supabase.from("products").select(
+    `
+    id,
+    name,
+    image_url,
+    qty,
+    description,
+    product_category(name, slug)
+    `
+  );
+  return data as unknown as ProductWithCategory[];
+};
+
+export const useGetProducts = () => {
+  return useQuery({
+    queryKey: ["products"],
+    queryFn: getProducts,
+  });
+};

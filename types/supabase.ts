@@ -166,25 +166,40 @@ export type Database = {
         Row: {
           created_at: string
           due_date: string | null
+          expiry_date: string | null
           id: string
+          issue_date: string
           notes: string | null
+          quote_number: string
+          status: string
           total_amount: number
+          updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           due_date?: string | null
+          expiry_date?: string | null
           id?: string
+          issue_date?: string
           notes?: string | null
+          quote_number?: string
+          status?: string
           total_amount: number
+          updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
           due_date?: string | null
+          expiry_date?: string | null
           id?: string
+          issue_date?: string
           notes?: string | null
+          quote_number?: string
+          status?: string
           total_amount?: number
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
