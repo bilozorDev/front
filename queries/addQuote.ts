@@ -1,12 +1,9 @@
-import { useCreateClerkSupabaseClient } from "@/utils/supabase/clerkSupabaseClient";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-
+import { createClient } from "@/utils/supabase/client";
 export function useAddQuote() {
-  const supabase = useCreateClerkSupabaseClient();
-
   const createQuote = useMutation({
     mutationFn: async () => {
+      const supabase = await createClient();
       const { data, error } = await supabase
         .from("quotes")
         .insert([{}])
@@ -25,6 +22,7 @@ export function useAddQuote() {
 
   const deleteQuote = useMutation({
     mutationFn: async (id: string) => {
+      const supabase = await createClient();
       const { error } = await supabase.from("quotes").delete().eq("id", id);
 
       if (error) throw error;
@@ -33,6 +31,7 @@ export function useAddQuote() {
 
   const updateQuote = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const supabase = await createClient();
       const { error } = await supabase.from("quotes").update(data).eq("id", id);
 
       if (error) throw error;

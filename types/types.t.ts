@@ -1,21 +1,25 @@
 // types.ts
-export interface Product {
-  id: string;
-  vendor_id: string;
-  name: string;
-  model: string;
-  description: string;
-  price: number;
-  product_url: string;
-  image_url: string;
-  image_urls: string[];
-  availability: string;
-  specs: Record<string, unknown>;
-  last_updated: string;
-  created_at: string;
-  category_id: string;
-  specs_image_url: string | null;
-}
+import { Tables, TablesInsert, TablesUpdate } from "./supabase";
+
+// Client types
+export type Client = Tables<"clients">;
+export type ClientInsert = TablesInsert<"clients">;
+export type ClientUpdate = TablesUpdate<"clients">;
+
+// Product types
+export type Product = Tables<"products">;
+export type ProductInsert = TablesInsert<"products">;
+export type ProductUpdate = TablesUpdate<"products">;
+
+// Quote types
+export type Quote = Tables<"quotes">;
+export type QuoteInsert = TablesInsert<"quotes">;
+export type QuoteUpdate = TablesUpdate<"quotes">;
+
+// Product category types
+export type ProductCategory = Tables<"product_category">;
+export type ProductCategoryInsert = TablesInsert<"product_category">;
+export type ProductCategoryUpdate = TablesUpdate<"product_category">;
 
 export interface AddProductSearchProps {
   open: boolean;

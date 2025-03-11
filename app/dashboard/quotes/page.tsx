@@ -3,7 +3,7 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import { useAddQuote } from "@/queries/addQuote";
-
+import PageHeaderWithAction from "@/components/PageHeaderWithAction";
 export default function Quotes() {
   const { createQuote } = useAddQuote();
 
@@ -12,18 +12,11 @@ export default function Quotes() {
   };
   return (
     <>
-      <div className="border-b border-gray-200 pb-5 sm:flex sm:items-center sm:justify-between">
-        <h3 className="text-base font-semibold text-gray-900">Quotes</h3>
-        <div className="mt-3 sm:mt-0 sm:ml-4">
-          <button
-            type="button"
-            onClick={() => handleCreateQuote()}
-            className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          >
-            Create new quote
-          </button>
-        </div>
-      </div>
+      <PageHeaderWithAction
+        title="Quotes"
+        action={handleCreateQuote}
+        actionText="Create new quote"
+      />
       <QuotesList />
     </>
   );
@@ -86,7 +79,7 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export function QuotesList() {
+function QuotesList() {
   return (
     <>
       <ul role="list" className="divide-y divide-gray-100">

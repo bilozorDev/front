@@ -14,7 +14,6 @@ import {
 import {
   Bars3Icon,
   BellIcon,
-  CalendarIcon,
   ChartPieIcon,
   Cog6ToothIcon,
   DocumentDuplicateIcon,
@@ -27,24 +26,44 @@ import {
   ChevronDownIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
-import { usePathname } from "next/navigation";
-import { SignedOut, SignInButton, useClerk, useUser } from "@clerk/nextjs";
-
+import { usePathname, useRouter } from "next/navigation";
+import { signOut, getUser } from "@/app/account/login/actions";
+import { useQuery } from "@tanstack/react-query";
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 const navigation = [
-  { name: "Dashboard", href: "/", icon: HomeIcon, current: true },
-  { name: "Quotes", href: "/quotes", icon: UsersIcon, current: false },
-  { name: "Inventory", href: "/inventory", icon: FolderIcon, current: false },
-  { name: "Clients", href: "/clients", icon: UsersIcon, current: false },
+  { name: "Dashboard", href: "/dashboard", icon: HomeIcon, current: true },
+  {
+    name: "Quotes",
+    href: "/dashboard/quotes",
+    icon: UsersIcon,
+    current: false,
+  },
+  {
+    name: "Products",
+    href: "/dashboard/products",
+    icon: FolderIcon,
+    current: false,
+  },
+  {
+    name: "Clients",
+    href: "/dashboard/clients",
+    icon: UsersIcon,
+    current: false,
+  },
   {
     name: "Settings",
-    href: "/settings",
+    href: "/dashboard/settings",
     icon: DocumentDuplicateIcon,
     current: false,
   },
-  { name: "Reports", href: "#", icon: ChartPieIcon, current: false },
+  {
+    name: "Reports",
+    href: "/dashboard/reports",
+    icon: ChartPieIcon,
+    current: false,
+  },
 ];
 const teams = [
   { id: 1, name: "Heroicons", href: "#", initial: "H", current: false },
@@ -52,19 +71,20 @@ const teams = [
   { id: 3, name: "Workcation", href: "#", initial: "W", current: false },
 ];
 const userNavigation = [
-  { name: "Your profile", href: "#" },
-  { name: "Sign out", href: "#" },
+  { name: "Your profile", href: "/account/" },
+  { name: "Sign out", href: "/account/logout", action: signOut },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const { signOut } = useClerk();
-  const { user } = useUser();
-  const { openUserProfile } = useClerk();
-
+  const router = useRouter();
+  const { data: user } = useQuery({
+    queryKey: ["user"],
+    queryFn: getUser,
+  });
   return (
-    <>
+    <div className="relative">
       <div>
         <Dialog
           open={sidebarOpen}
@@ -105,8 +125,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     className="h-8 w-auto"
                   />
                 </div>
-                <nav className="flex flex-1 flex-col">
-                  <ul role="list" className="flex flex-1 flex-col gap-y-7">
+                <nav className="flex flex-1 flex-col ">
+                  <ul role="list" className="flex flex-1 flex-col gap-y-7 ">
                     <li>
                       <ul role="list" className="-mx-2 space-y-1">
                         {navigation.map((item) => (
@@ -115,7 +135,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                               href={item.href}
                               className={classNames(
                                 item.href === pathname
-                                  ? "bg-gray-50 text-indigo-600"
+                                  ? "bg-gray-50 text-indigo-600 "
                                   : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
                                 "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
                               )}
@@ -187,6 +207,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </Dialog>
 
         {/* Static sidebar for desktop */}
+
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
@@ -197,7 +218,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 className="h-8 w-auto"
               />
             </div>
-            <nav className="flex flex-1 flex-col">
+            <nav className="flex flex-1 flex-col ">
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
                 <li>
                   <ul role="list" className="-mx-2 space-y-1">
@@ -323,54 +344,50 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 />
 
                 {/* Profile dropdown */}
-                {!user ?
-                  <SignInButton />
-                  : (
-                    <Menu as="div" className="relative">
-                      <MenuButton className="-m-1.5 flex items-center p-1.5" >
-                        <span className="sr-only">Open user menu</span>
-                        <img
-                          alt={user?.fullName ?? ""}
-                          src={`https://placehold.co/600x400?text=${user?.fullName?.[0]}`}
-                          className="w-8 h-8 object-cover rounded-full overflow-hidden aspect-square bg-gray-50"
-                        />
-                        <span className="hidden lg:flex lg:items-center">
-                          <span
-                            aria-hidden="true"
-                            className="ml-4 text-sm/6 font-semibold text-gray-900"
-                          >
-                            {user?.fullName}
-                          </span>
-                          <ChevronDownIcon
-                            aria-hidden="true"
-                            className="ml-2 size-5 text-gray-400"
-                          />
-                        </span>
-                      </MenuButton>
-
-                      <MenuItems
-                        transition
-                        className="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 ring-1 shadow-lg ring-gray-900/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
+                <Menu as="div" className="relative">
+                  <MenuButton className="-m-1.5 flex items-center p-1.5">
+                    <span className="sr-only">Open user menu</span>
+                    <img
+                      alt={user?.email ?? ""}
+                      src={`https://placehold.co/600x400?text=${user?.email?.[0]}`}
+                      className="w-8 h-8 object-cover rounded-full overflow-hidden aspect-square bg-gray-50"
+                    />
+                    <span className="hidden lg:flex lg:items-center">
+                      <span
+                        aria-hidden="true"
+                        className="ml-4 text-sm/6 font-semibold text-gray-900"
                       >
-                        <MenuItem>
-                          <button
-                            onClick={() => openUserProfile()}
-                            className="block px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden hover:underline"
-                          >
-                            User Profile
-                          </button>
-                        </MenuItem>
-                        <MenuItem>
-                          <button
-                            onClick={() => signOut()}
-                            className="block px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden hover:underline"
-                          >
-                            Sign out
-                          </button>
-                        </MenuItem>
-                      </MenuItems>
-                    </Menu>
-                  )}
+                        {user?.email}
+                      </span>
+                      <ChevronDownIcon
+                        aria-hidden="true"
+                        className="ml-2 size-5 text-gray-400"
+                      />
+                    </span>
+                  </MenuButton>
+
+                  <MenuItems
+                    transition
+                    className="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 ring-1 shadow-lg ring-gray-900/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
+                  >
+                    {userNavigation.map((item) => (
+                      <MenuItem key={item.name}>
+                        <button
+                          className="block px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden hover:underline"
+                          onClick={() => {
+                            if (item.action) {
+                              item.action();
+                            } else {
+                              router.push(item.href);
+                            }
+                          }}
+                        >
+                          {item.name}
+                        </button>
+                      </MenuItem>
+                    ))}
+                  </MenuItems>
+                </Menu>
               </div>
             </div>
           </div>
@@ -380,6 +397,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </main>
         </div>
       </div>
-    </>
+    </div>
   );
 }

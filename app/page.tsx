@@ -1,8 +1,6 @@
-import { createClient } from "@/utils/supabase/server";
+"use client";
+import { redirect } from "next/navigation";
 
-export default async function Home() {
-  const supabase = await createClient();
-  const { data: products } = await supabase.from("products").select();
-
-  return <pre>{JSON.stringify(products, null, 2)}</pre>;
+export default function Home() {
+  return redirect("/dashboard");
 }

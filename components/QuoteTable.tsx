@@ -1,7 +1,7 @@
 import useQuoteStore from "@/store/quote-store";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import AddProductSearch from "./AddProductSearch";
+// import AddProductSearch from "./AddProductSearch";
 import { formatPrice } from "@/utils/formatPrice";
 import { MinusIcon, PlusIcon } from "@heroicons/react/16/solid";
 
@@ -14,7 +14,7 @@ function calculateTotalForProduct(
 }
 
 function QuoteTable() {
-  const [open, setOpen] = useState(false);
+  const [, setOpen] = useState(false);
   const { quote, removeProduct, increaseQuantity, decreaseQuantity } =
     useQuoteStore();
 
@@ -148,7 +148,7 @@ function QuoteTable() {
           </div>
         </div>
       </div>
-      <AddProductSearch open={open} setOpen={setOpen} />
+      {/* <AddProductSearch open={open} setOpen={setOpen} /> */}
     </div>
   );
 }
