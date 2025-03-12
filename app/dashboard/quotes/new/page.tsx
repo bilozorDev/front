@@ -1,19 +1,19 @@
 "use client";
 import ClientInfoHeader from "@/components/quotes/ClientHeader";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import AddProduct from "@/components/quotes/AddProduct";
 import useQuoteStore from "@/store/quote-store";
+import { useRouter } from "next/navigation";
 export default function NewQuote() {
   const [open, setOpen] = useState(false);
 
-  const {
-    quoteProducts,
-    resetQuote,
-    updateQty,
-    removeProduct,
-    dueDate,
-    updateDueDate,
-  } = useQuoteStore();
+  const { quoteProducts, updateQty, removeProduct, dueDate, updateDueDate } =
+    useQuoteStore();
+  const sevenDaysFromNow = new Date(
+    new Date().setDate(new Date().getDate() + 7)
+  )
+    .toISOString()
+    .split("T")[0];
   return (
     <main className="min-h-screen flex flex-col justify-between ">
       <div className="flex-grow ">
@@ -25,7 +25,7 @@ export default function NewQuote() {
               <span className="text-gray-500">Due Date: </span>
               <input
                 type="date"
-                value={dueDate}
+                value={dueDate || sevenDaysFromNow}
                 className="border border-gray-300 rounded-md p-1"
                 onChange={(e) => updateDueDate(e.target.value)}
                 min={new Date().toISOString().split("T")[0]}
@@ -108,21 +108,12 @@ export default function NewQuote() {
               </tr>
             ))}
             <tr className="w-full">
-              <td
-                colSpan={4}
-                className="py-5 flex justify-start items-center  pl-8 pr-0 text-right align-top tabular-nums text-gray-700"
-              >
+              <td className="py-5 flex justify-start items-center   pr-0 text-right align-top tabular-nums text-gray-700">
                 <button
                   className="bg-blue-500 text-white px-4 py-2 rounded-md"
                   onClick={() => setOpen(true)}
                 >
                   Add Product
-                </button>
-                <button
-                  className="bg-red-500 text-white px-4 py-2 rounded-md"
-                  onClick={() => resetQuote()}
-                >
-                  Reset Quote
                 </button>
               </td>
             </tr>
@@ -162,16 +153,38 @@ const TableFooter = () => {
 };
 
 export function FloatingStatusBar() {
+  const { resetQuote } = useQuoteStore();
+  const router = useRouter();
+  const handleResetQuote = () => {
+    resetQuote();
+    router.replace("/dashboard/quotes/new");
+  };
   return (
     <div className="sticky bottom-5 w-full pb-2 sm:pb-5 z-50  ">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="rounded-lg bg-indigo-500 p-2 shadow-lg sm:p-3">
           <div className="flex items-center justify-between">
+            <div>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded-md"
+                onClick={handleResetQuote}
+              >
+                Reset Quote
+              </button>
+            </div>
             <p className="ml-3 truncate font-medium text-lg text-white">
-              <span className="text-gray-50">Quote # 123456</span>
+              {/* <span className="text-gray-50">Quote # 123456</span> */}
               {/* <span className="text-gray-300 ml-2">Saved as draft</span> */}
             </p>
             <div className="flex ml-autoflex-row gap-2 items-center">
+              <button
+                onClick={() => {
+                  console.log("save");
+                }}
+                className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-50"
+              >
+                Save as draft
+              </button>
               <a
                 href="#"
                 className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-50"
