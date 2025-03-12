@@ -181,13 +181,13 @@ export function FloatingStatusBar() {
                 onClick={() => {
                   console.log("save");
                 }}
-                className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-50"
+                className="flex items-center justify-center rounded-md border border-transparent bg-gray-300 px-3 py-2 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-50"
               >
                 Save as draft
               </button>
               <a
                 href="#"
-                className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-2 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-50"
+                className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-3 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-50"
               >
                 Review and send
               </a>
