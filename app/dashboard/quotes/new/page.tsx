@@ -5,6 +5,7 @@ import AddProduct from "@/components/quotes/AddProduct";
 import useQuoteStore from "@/store/quote-store";
 export default function NewQuote() {
   const [open, setOpen] = useState(false);
+
   const {
     quoteProducts,
     resetQuote,
@@ -168,7 +169,7 @@ export function FloatingStatusBar() {
           <div className="flex items-center justify-between">
             <p className="ml-3 truncate font-medium text-lg text-white">
               <span className="text-gray-50">Quote # 123456</span>
-              <span className="text-gray-300 ml-2">Saved as draft</span>
+              {/* <span className="text-gray-300 ml-2">Saved as draft</span> */}
             </p>
             <div className="flex ml-autoflex-row gap-2 items-center">
               <a

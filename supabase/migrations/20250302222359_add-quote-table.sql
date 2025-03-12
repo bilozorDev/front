@@ -4,12 +4,12 @@ CREATE TABLE
     quotes (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         quote_number VARCHAR(20) UNIQUE NOT NULL DEFAULT 'QT-' || substring(md5(random()::text) from 1 for 10),
-        user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+        user_id UUID NOT NULL DEFAULT auth.uid(),
         status VARCHAR(20) NOT NULL DEFAULT 'draft',
         issue_date DATE DEFAULT CURRENT_DATE NOT NULL,
         expiry_date DATE,
         due_date DATE,
-        total_amount DECIMAL(12, 2) NOT NULL,
+        total_amount DECIMAL(12, 2) ,
         notes TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
