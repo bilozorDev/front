@@ -10,14 +10,21 @@ import {
   MenuItem,
   MenuItems,
 } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  XMarkIcon,
+  PlusIcon,
+  MinusCircleIcon,
+  ArrowLeftIcon,
+} from "@heroicons/react/24/outline";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import {
   ProductWithCategory,
   useGetProducts,
   useGetProductCategories,
 } from "@/queries/products/client";
-
+import Link from "next/link";
+import { Product } from "@/types/types.t";
+import useQuoteStore from "@/store/quote-store";
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
@@ -26,6 +33,10 @@ interface AddProductProps {
   open: boolean;
   setOpen: (open: boolean) => void;
 }
+
+const checkIfProductAdded = (product: Product, quoteProducts: Product[]) => {
+  return quoteProducts.some((p) => p.id === product.id);
+};
 
 export default function AddProduct({ open, setOpen }: AddProductProps) {
   const [openCustomProduct, setOpenCustomProduct] = useState(false);
@@ -37,6 +48,16 @@ export default function AddProduct({ open, setOpen }: AddProductProps) {
       product.product_category.name === selectedCategory ||
       selectedCategory === null
   );
+  const { addProduct, quoteProducts, removeProduct } = useQuoteStore();
+  const handleAddProduct = (product: Product) => {
+    if (product.qty === 0) {
+      confirm(
+        "This product is out of stock. Do you want to add it to the quote?"
+      );
+    }
+
+    addProduct({ ...product, qty: 1 });
+  };
   return (
     <Dialog open={open} onClose={setOpen} className="relative z-50">
       <div className="fixed inset-0" />
@@ -109,13 +130,25 @@ export default function AddProduct({ open, setOpen }: AddProductProps) {
                 >
                   {filteredProducts &&
                     filteredProducts?.map((product) => (
-                      <li key={product.id}>
+                      <li key={product.id} className="cursor-pointer ">
                         <div className="group relative flex items-center px-5 py-6">
+                          <button
+                            onClick={() => {
+                              if (checkIfProductAdded(product, quoteProducts)) {
+                                removeProduct(product);
+                              } else {
+                                handleAddProduct(product);
+                              }
+                            }}
+                            className="flex items-center gap-x-2"
+                          >
+                            {checkIfProductAdded(product, quoteProducts) ? (
+                              <MinusCircleIcon className="size-5 text-red-500" />
+                            ) : (
+                              <PlusIcon className="size-5 text-gray-400" />
+                            )}
+                          </button>
                           <div className="-m-1 block flex-1 p-1">
-                            <div
-                              aria-hidden="true"
-                              className="absolute inset-0 group-hover:bg-gray-50"
-                            />
                             <div className="relative flex min-w-0 flex-1 items-center">
                               <span className="relative inline-block shrink-0">
                                 {/* <img alt="" src={product.imageUrl} className="size-10 rounded-full" /> */}
@@ -156,12 +189,12 @@ export default function AddProduct({ open, setOpen }: AddProductProps) {
                             >
                               <div className="py-1">
                                 <MenuItem>
-                                  <a
-                                    href="#"
+                                  <Link
+                                    href={`/products/${product.id}`}
                                     className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
                                   >
-                                    View profile
-                                  </a>
+                                    Product details
+                                  </Link>
                                 </MenuItem>
                                 <MenuItem>
                                   <a
@@ -245,21 +278,14 @@ export function AddCustomProduct({ open, setOpen }: AddCustomProductProps) {
             >
               <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
                 <div className="p-6">
-                  <div className="flex items-start justify-between">
-                    <DialogTitle className="text-base font-semibold text-gray-900">
+                  <div className="flex items-center space-x-4">
+                    <ArrowLeftIcon
+                      className="size-5 text-gray-400 cursor-pointer"
+                      onClick={() => setOpen(false)}
+                    />
+                    <DialogTitle className="text-base  font-semibold text-gray-900">
                       Add non-inventory product
                     </DialogTitle>
-                    <div className="ml-3 flex h-7 items-center">
-                      <button
-                        type="button"
-                        onClick={() => setOpen(false)}
-                        className="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500"
-                      >
-                        <span className="absolute -inset-2.5" />
-                        <span className="sr-only">Close panel</span>
-                        <XMarkIcon aria-hidden="true" className="size-6" />
-                      </button>
-                    </div>
                   </div>
                 </div>
               </div>

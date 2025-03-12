@@ -1,85 +1,51 @@
 import { create } from "zustand";
-import { v4 as uuidv4 } from "uuid";
 import { persist } from "zustand/middleware";
+import { Product } from "@/types/types.t";
 interface QuoteStore {
-  quote: Quote;
-  addProduct: (product: QuoteProduct) => void;
-  removeProduct: (product: QuoteProduct) => void;
-  setMarkup: (markup: number) => void;
-  increaseQuantity: (product: QuoteProduct) => void;
-  decreaseQuantity: (product: QuoteProduct) => void;
-}
-
-interface QuoteProduct {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  total: number;
-}
-export interface Quote {
-  markup: number;
-  products: QuoteProduct[];
-}
-
-function calculateTotalForProduct(
-  price: number,
-  quantity: number,
-  margin: number
-) {
-  return price * margin * quantity;
+  quoteProducts: Product[];
+  dueDate: string;
+  clientId: string;
+  addProduct: (product: Product) => void;
+  removeProduct: (product: Product) => void;
+  updateClientId: (clientId: string) => void;
+  updateQty: (id: string, qty: number) => void;
+  updateDueDate: (dueDate: string) => void;
+  resetQuote: () => void;
 }
 
 const useQuoteStore = create<QuoteStore>()(
   persist(
     (set) => ({
-      quote: {
-        markup: 1.2,
-        products: [],
-      },
-
-      addProduct: (product: QuoteProduct) => {
+      quoteProducts: [],
+      dueDate: new Date(new Date().setDate(new Date().getDate() + 10))
+        .toISOString()
+        .split("T")[0],
+      clientId: "",
+      addProduct: (product: Product) => {
         set((state) => ({
-          quote: {
-            ...state.quote,
-            products: [...state.quote.products, product],
-          },
+          quoteProducts: [...state.quoteProducts, product],
         }));
       },
-      removeProduct: (product: QuoteProduct) => {
+      updateClientId: (clientId: string) => {
+        set({ clientId });
+      },
+      updateDueDate: (dueDate: string) => {
+        set({ dueDate });
+      },
+      removeProduct: (product: Product) => {
         set((state) => ({
-          quote: {
-            ...state.quote,
-            products: state.quote.products.filter((p) => p.id !== product.id),
-          },
+          quoteProducts: state.quoteProducts.filter((p) => p.id !== product.id),
         }));
       },
-      setMarkup: (markup: number) => {
+      updateQty: (id: string, qty: number) => {
         set((state) => ({
-          quote: { ...state.quote, markup },
+          quoteProducts: state.quoteProducts.map((p) =>
+            p.id === id ? { ...p, qty } : p
+          ),
         }));
       },
-      increaseQuantity: (product: QuoteProduct) => {
-        set((state) => ({
-          quote: {
-            ...state.quote,
-            products: state.quote.products.map((p) =>
-              p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p
-            ),
-          },
-        }));
-      },
-      decreaseQuantity: (product: QuoteProduct) => {
-        set((state) => ({
-          quote: {
-            ...state.quote,
-            products: state.quote.products.map((p) =>
-              p.id === product.id
-                ? { ...p, quantity: p.quantity > 1 ? p.quantity - 1 : 1 }
-                : p
-            ),
-          },
-        }));
+      resetQuote: () => {
+        set({ quoteProducts: [], clientId: "", dueDate: "" });
       },
     }),
     {
