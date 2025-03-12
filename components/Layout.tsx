@@ -33,36 +33,31 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: HomeIcon, current: true },
+  { name: "Dashboard", href: "/dashboard", icon: HomeIcon },
   {
     name: "Quotes",
     href: "/dashboard/quotes",
     icon: UsersIcon,
-    current: false,
   },
   {
     name: "Products",
     href: "/dashboard/products",
     icon: FolderIcon,
-    current: false,
   },
   {
     name: "Clients",
     href: "/dashboard/clients",
     icon: UsersIcon,
-    current: false,
   },
   {
     name: "Settings",
     href: "/dashboard/settings",
     icon: DocumentDuplicateIcon,
-    current: false,
   },
   {
     name: "Reports",
     href: "/dashboard/reports",
     icon: ChartPieIcon,
-    current: false,
   },
 ];
 const teams = [
@@ -74,6 +69,17 @@ const userNavigation = [
   { name: "Your profile", href: "/account/" },
   { name: "Sign out", href: "/account/logout", action: signOut },
 ];
+
+const isActive = (pathname: string, href: string): boolean => {
+  // Special case for dashboard home
+  if (href === "/dashboard") {
+    // Only active when exactly at /dashboard or /dashboard/
+    return pathname === "/dashboard" || pathname === "/dashboard/";
+  }
+
+  // For other routes, check if the pathname starts with the href
+  return pathname === href || pathname.startsWith(`${href}/`);
+};
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -134,8 +140,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             <a
                               href={item.href}
                               className={classNames(
-                                item.href === pathname
-                                  ? "bg-gray-50 text-indigo-600 "
+                                isActive(pathname, item.href)
+                                  ? "bg-gray-50 text-indigo-600"
                                   : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
                                 "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
                               )}
@@ -143,7 +149,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                               <item.icon
                                 aria-hidden="true"
                                 className={classNames(
-                                  item.href === pathname
+                                  isActive(pathname, item.href)
                                     ? "text-indigo-600"
                                     : "text-gray-400 group-hover:text-indigo-600",
                                   "size-6 shrink-0"
@@ -165,7 +171,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             <a
                               href={team.href}
                               className={classNames(
-                                team.href === pathname
+                                isActive(pathname, team.href)
                                   ? "bg-gray-50 text-indigo-600"
                                   : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
                                 "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
@@ -173,7 +179,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             >
                               <span
                                 className={classNames(
-                                  team.href === pathname
+                                  isActive(pathname, team.href)
                                     ? "border-indigo-600 text-indigo-600"
                                     : "border-gray-200 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600",
                                   "flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium"
@@ -227,7 +233,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         <a
                           href={item.href}
                           className={classNames(
-                            item.href === pathname
+                            isActive(pathname, item.href)
                               ? "bg-gray-50 text-indigo-600"
                               : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
                             "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
@@ -236,7 +242,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                           <item.icon
                             aria-hidden="true"
                             className={classNames(
-                              item.href === pathname
+                              isActive(pathname, item.href)
                                 ? "text-indigo-600"
                                 : "text-gray-400 group-hover:text-indigo-600",
                               "size-6 shrink-0"
@@ -258,7 +264,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         <a
                           href={team.href}
                           className={classNames(
-                            team.href === pathname
+                            team.href.includes(pathname)
                               ? "bg-gray-50 text-indigo-600"
                               : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
                             "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
@@ -266,7 +272,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         >
                           <span
                             className={classNames(
-                              team.href === pathname
+                              team.href.includes(pathname)
                                 ? "border-indigo-600 text-indigo-600"
                                 : "border-gray-200 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600",
                               "flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium"
