@@ -1,9 +1,11 @@
 "use client";
 import ClientInfoHeader from "@/components/quotes/ClientHeader";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import AddProduct from "@/components/quotes/AddProduct";
 import useQuoteStore from "@/store/quote-store";
 import { useRouter } from "next/navigation";
+import { createQuote, useCreateQuote } from "@/queries/quotes/client";
+import { Quote } from "@/types/types.t";
 export default function NewQuote() {
   const [open, setOpen] = useState(false);
 
@@ -153,11 +155,38 @@ const TableFooter = () => {
 };
 
 export function FloatingStatusBar() {
-  const { resetQuote } = useQuoteStore();
+  const { resetQuote, quoteProducts, clientId, dueDate } = useQuoteStore();
+  const { mutate: createQuote, isPending } = useCreateQuote();
   const router = useRouter();
   const handleResetQuote = () => {
     resetQuote();
     router.replace("/dashboard/quotes/new");
+  };
+  const handleSave = () => {
+    console.log("save");
+  };
+  const handleReviewAndSend = () => {
+    if (!clientId) {
+      alert("Please select a client");
+      return;
+    }
+    if (quoteProducts.length === 0) {
+      alert("Please add at least one product");
+      return;
+    }
+
+    createQuote(
+      {},
+      {
+        onSuccess: (data: Quote) => {
+          // Do anything else with the data here
+          console.log("Quote created:", data.id);
+
+          // Then navigate
+          router.push(`/dashboard/quotes/${data.id}`);
+        },
+      }
+    );
   };
   return (
     <div className="sticky bottom-5 w-full pb-2 sm:pb-5 z-50  ">
@@ -178,19 +207,18 @@ export function FloatingStatusBar() {
             </p>
             <div className="flex ml-autoflex-row gap-2 items-center">
               <button
-                onClick={() => {
-                  console.log("save");
-                }}
+                onClick={handleSave}
                 className="flex items-center justify-center rounded-md border border-transparent bg-gray-300 px-3 py-2 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-50"
               >
                 Save as draft
               </button>
-              <a
-                href="#"
+              <button
+                onClick={handleReviewAndSend}
+                disabled={isPending}
                 className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-3 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-50"
               >
-                Review and send
-              </a>
+                {isPending ? "Saving..." : "Review and Send"}
+              </button>
             </div>
           </div>
         </div>

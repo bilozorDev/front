@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
-
+import { QuoteInsert } from "@/types/types.t";
 const supabase = createClient();
 
 const getQuotes = async () => {
@@ -14,54 +14,43 @@ export const useGetQuotes = () => {
     queryFn: getQuotes,
   });
 };
+const createQuote = async (quoteData: QuoteInsert) => {
+  const { data, error } = await supabase
+    .from("quotes")
+    .insert(quoteData)
+    .select();
 
-const createQuote = async () => {
-  const { data, error } = await supabase.from("quotes").insert({}).select();
-  return { data, error };
+  if (error) throw error;
+  return data[0];
 };
 
 export const useCreateQuote = () => {
   return useMutation({
     mutationFn: createQuote,
-    onSuccess: ({ data }) => {
-      if (data && data[0]) {
-        console.log("Created quote with ID:", data[0]);
-      }
+    onSuccess: (data) => {
+      console.log("Created quote with ID:", data.id);
+
+      return data;
     },
     onError: (error) => {
-      console.log(error);
+      console.error("Error creating quote:", error);
+      alert("Failed to create quote");
     },
   });
 };
 
-const addProductToQuote = async (quoteId: string, productId: string) => {
-  const { data, error } = await supabase.from("quote_products").insert({
-    quote_id: quoteId,
-    product_id: productId,
-  });
-  return data;
-};
-
-export const useAddProductToQuote = (quoteId: string, productId: string) => {
-  return useMutation({
-    mutationFn: () => addProductToQuote(quoteId, productId),
-  });
-};
-
-const removeProductFromQuote = async (quoteId: string, productId: string) => {
+export const getQuoteById = async (id: string) => {
   const { data, error } = await supabase
-    .from("quote_products")
-    .delete()
-    .eq("quote_id", quoteId)
-    .eq("product_id", productId);
-  return data;
+    .from("quotes")
+    .select("*")
+    .eq("id", id)
+    .single();
+  return { data, error };
 };
 
-export const useRemoveProductFromQuote = (
-  quoteId: string,
-  productId: string
-) => {
-  return useMutation({
-    mutationFn: () => removeProductFromQuote(quoteId, productId),
+export const useGetQuoteById = (id: string) => {
+  return useQuery({
+    queryKey: ["quote", id],
+    queryFn: () => getQuoteById(id),
   });
 };
