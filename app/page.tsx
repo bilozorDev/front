@@ -1,7 +1,7 @@
 "use client";
-
+import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { ChevronRightIcon, StarIcon } from "@heroicons/react/20/solid";
-
+import { useRouter } from "next/navigation";
 const stats = [
   { label: "Founded", value: "2021" },
   { label: "Employees", value: "5" },
@@ -109,6 +109,8 @@ const footerNavigation = {
 };
 
 export default function Home() {
+  const router = useRouter();
+  const { user } = useUser();
   return (
     <div className="bg-white">
       <main>
@@ -136,7 +138,7 @@ export default function Home() {
                   </a>
                 </div>
                 <div className="mt-6 sm:max-w-xl">
-                  <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl capitalize">
+                  <h1 className="text-4xl font-bold capitalize tracking-tight text-gray-900 sm:text-5xl">
                     Inventory and quote management for growing teams
                   </h1>
                   <p className="mt-6 text-xl text-gray-500">
@@ -144,30 +146,50 @@ export default function Home() {
                     easily.
                   </p>
                 </div>
-                <form
-                  action="#"
-                  className="mt-12 sm:flex sm:w-full sm:max-w-lg"
-                >
-                  <div className="min-w-0 flex-1">
-                    <label htmlFor="hero-email" className="sr-only">
-                      Email address
-                    </label>
-                    <input
-                      id="hero-email"
-                      type="email"
-                      placeholder="Enter your email"
-                      className="block w-full rounded-md border border-gray-300 px-5 py-3 text-base text-gray-900 placeholder-gray-500 shadow-sm outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
-                    />
-                  </div>
-                  <div className="mt-4 sm:ml-3 sm:mt-0">
+                <SignedOut>
+                  <form
+                    action="#"
+                    className="mt-12 sm:flex sm:w-full sm:max-w-lg"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <label htmlFor="hero-email" className="sr-only">
+                        Email address
+                      </label>
+                      <input
+                        id="hero-email"
+                        type="email"
+                        placeholder="Enter your email"
+                        className="block w-full rounded-md border border-gray-300 px-5 py-3 text-base text-gray-900 placeholder-gray-500 shadow-sm outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
+                      />
+                    </div>
+                    <div className="mt-4 sm:ml-3 sm:mt-0">
+                      <button
+                        type="submit"
+                        onClick={() => {
+                          router.push("/sign-in");
+                        }}
+                        className="block w-full rounded-md border border-transparent bg-rose-500 px-5 py-3 text-base font-medium text-white shadow hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 sm:px-10"
+                      >
+                        Notify me
+                      </button>
+                    </div>
+                  </form>
+                </SignedOut>
+                <SignedIn>
+                  <div className="pt-8 sm:ml-3 sm:mt-0">
+                    <p className="text-lg text-gray-500">
+                      Signed in as: {user?.emailAddresses[0].emailAddress}
+                    </p>
                     <button
-                      type="submit"
-                      className="block w-full rounded-md border border-transparent bg-rose-500 px-5 py-3 text-base font-medium text-white shadow hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 sm:px-10"
+                      onClick={() => {
+                        router.push("/dashboard");
+                      }}
+                      className="mt-4 block w-full rounded-md border border-transparent bg-rose-500 px-5 py-3 text-base font-medium text-white shadow hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 sm:px-10"
                     >
-                      Notify me
+                      Go to your dashboard
                     </button>
                   </div>
-                </form>
+                </SignedIn>
                 <div className="mt-6">
                   <div className="inline-flex items-center divide-x divide-gray-300">
                     <div className="flex shrink-0 pr-5">
