@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Product/Quote Management
 
-## Getting Started
+A comprehensive client management and quotation platform that helps track clients, products, and create professional quotes.
 
-First, run the development server:
+## Tech Stack
 
+- **Frontend**: [Next.js](https://nextjs.org) with App Router
+- **Database**: Supabase (PostgreSQL)
+- **State Management**: Zustand
+- **Authentication**: Supabase Auth (migration to Clerk planned)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com)
+- **Deployment**: Vercel
+
+## Features
+
+- Client management
+- Product catalog with search
+- Quote creation and management
+- Dashboard with analytics
+- User authentication and account management
+
+## Development Setup
+
+### Prerequisites
+
+- Node.js (v18+)
+- Docker (for local Supabase)
+- npm, pnpm, yarn, or bun
+
+### Setting up Supabase locally
+
+1. Install the Supabase CLI:
+```bash
+npm install -g supabase
+```
+
+2. Start the local Supabase:
+```bash
+supabase start
+```
+
+3. Apply migrations:
+```bash
+supabase migration up
+```
+
+4. Seed the database:
+```bash
+supabase db reset
+```
+
+### Running the app
+
+1. Install dependencies:
+```bash
+npm install
+# or
+pnpm install
+# or
+yarn
+```
+
+2. Copy the `.env.example` file to `.env.local` and fill in the required values.
+
+3. Start the development server:
 ```bash
 npm run dev
 # or
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Planned Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Python Web Scraper**: Automatically fetch and update product information
+- **Automated Reminders**: Send notifications for upcoming quote due dates
+- **Stock Notifications**: Alert when products go out of stock
+- **Invoice Generation**: Convert quotes to invoices
+- **Analytics Dashboard**: Enhanced reporting and visualization
 
-## Learn More
+## Database
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The project uses Supabase with tables for clients, products, quotes, and users.
