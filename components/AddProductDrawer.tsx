@@ -1,26 +1,15 @@
 "use client";
 
-import { Dialog, DialogPanel, DialogTitle, Field } from "@headlessui/react";
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { ChevronDownIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useQueryParamsToggle } from "@/hooks/useQueryParamsToggle";
-import { z } from "zod";
-import { AnyFieldApi, useForm, useStore } from "@tanstack/react-form";
+import { useForm } from "@tanstack/react-form";
 import {
   useCreateProduct,
   useGetProductCategories,
 } from "@/queries/products/client";
 import { useSearchParams } from "next/navigation";
 import { ProductInsert } from "@/types/types.t";
-function FieldInfo({ field }: { field: AnyFieldApi }) {
-  return (
-    <>
-      {field.state.meta.isTouched && field.state.meta.errors.length ? (
-        <em>{field.state.meta.errors.map((err) => err.message).join(",")}</em>
-      ) : null}
-      {field.state.meta.isValidating ? "Validating..." : null}
-    </>
-  );
-}
 
 export default function AddProductDrawer() {
   const categorySearchParam = useSearchParams().get("category");
@@ -28,7 +17,7 @@ export default function AddProductDrawer() {
   const { isActive, handleToggle } = useQueryParamsToggle({
     paramsName: "addProduct",
   });
-  const { mutate: createProduct, isPending, error } = useCreateProduct();
+  const { mutate: createProduct  } = useCreateProduct();
   const form = useForm({
     defaultValues: {
       category_id: categorySearchParam ?? "",
@@ -354,9 +343,8 @@ export default function AddProductDrawer() {
                   >
                     Cancel
                   </button>
-                  <form.Subscribe
-                    selector={(state) => [state.canSubmit, state.isSubmitting]}
-                    children={([canSubmit, isSubmitting]) => (
+                  <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+                    {([canSubmit, isSubmitting]) => (
                       <button
                         type="submit"
                         disabled={!canSubmit || isSubmitting}
@@ -365,7 +353,7 @@ export default function AddProductDrawer() {
                         {isSubmitting ? "..." : "Add"}
                       </button>
                     )}
-                  />
+                  </form.Subscribe>
                 </div>
               </form>
             </DialogPanel>

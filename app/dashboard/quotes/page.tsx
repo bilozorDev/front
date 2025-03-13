@@ -4,6 +4,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import PageHeaderWithAction from "@/components/PageHeaderWithAction";
 import { useRouter } from "next/navigation";
+import { Suspense } from "react";
 export default function Quotes() {
   const router = useRouter();
   const handleCreateQuote = () => {
@@ -11,11 +12,13 @@ export default function Quotes() {
   };
   return (
     <>
-      <PageHeaderWithAction
-        title="Quotes"
-        action={handleCreateQuote}
-        actionText="Create new quote"
-      />
+      <Suspense>
+        <PageHeaderWithAction
+          title="Quotes"
+          action={handleCreateQuote}
+          actionText="Create new quote"
+        />
+      </Suspense>
       <QuotesList />
     </>
   );

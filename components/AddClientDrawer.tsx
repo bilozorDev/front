@@ -1,16 +1,11 @@
 "use client";
 
-import { Dialog, DialogPanel, DialogTitle, Field } from "@headlessui/react";
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { getClientByEmail, useCreateClient } from "@/queries/clients/queries";
 import { useQueryParamsToggle } from "@/hooks/useQueryParamsToggle";
 import { z } from "zod";
-import { AnyFieldApi, useForm, useStore } from "@tanstack/react-form";
-
-function isValidEmail(email: string) {
-  const emailRegex = /\S+@\S+\.\S+/;
-  return emailRegex.test(email);
-}
+import { AnyFieldApi, useForm } from "@tanstack/react-form";
 
 const personSchema = z.object({
   name: z.string().min(1),
@@ -34,7 +29,7 @@ export default function AddClientDrawer() {
   const { isActive, handleToggle } = useQueryParamsToggle({
     paramsName: "addClient",
   });
-  const { mutate: createClient, isPending, error } = useCreateClient();
+  const { mutate: createClient } = useCreateClient();
 
   const form = useForm({
     defaultValues: {
@@ -53,7 +48,9 @@ export default function AddClientDrawer() {
           handleToggle();
           form.reset();
         },
-        onError: (error) => {},
+        onError: (error) => {
+          console.error(error);
+        },
       });
     },
   });
@@ -116,13 +113,8 @@ export default function AddClientDrawer() {
                             Client name
                           </label>
                           <div className="mt-2">
-                            <form.Field
-                              name="name"
-                              children={({
-                                state,
-                                handleChange,
-                                handleBlur,
-                              }) => (
+                            <form.Field name="name">
+                              {({ state, handleChange, handleBlur }) => (
                                 <input
                                   value={state.value}
                                   onChange={(e) => handleChange(e.target.value)}
@@ -130,7 +122,7 @@ export default function AddClientDrawer() {
                                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                 />
                               )}
-                            />
+                            </form.Field>
                           </div>
                         </div>
 
@@ -204,13 +196,8 @@ export default function AddClientDrawer() {
                             Phone
                           </label>
                           <div className="mt-2">
-                            <form.Field
-                              name="phone"
-                              children={({
-                                state,
-                                handleChange,
-                                handleBlur,
-                              }) => (
+                            <form.Field name="phone">
+                              {({ state, handleChange, handleBlur }) => (
                                 <input
                                   id="client-phone"
                                   name="client-phone"
@@ -221,7 +208,7 @@ export default function AddClientDrawer() {
                                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                 />
                               )}
-                            />
+                            </form.Field>
                           </div>
                         </div>
                         <div>
@@ -232,13 +219,8 @@ export default function AddClientDrawer() {
                             Address
                           </label>
                           <div className="mt-2">
-                            <form.Field
-                              name="address"
-                              children={({
-                                state,
-                                handleChange,
-                                handleBlur,
-                              }) => (
+                            <form.Field name="address">
+                              {({ state, handleChange, handleBlur }) => (
                                 <input
                                   id="client-address"
                                   name="client-address"
@@ -249,7 +231,7 @@ export default function AddClientDrawer() {
                                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                 />
                               )}
-                            />
+                            </form.Field>
                           </div>
                         </div>
                       </div>
@@ -266,7 +248,8 @@ export default function AddClientDrawer() {
                   </button>
                   <form.Subscribe
                     selector={(state) => [state.canSubmit, state.isSubmitting]}
-                    children={([canSubmit, isSubmitting]) => (
+                  >
+                    {([canSubmit, isSubmitting]) => (
                       <button
                         type="submit"
                         disabled={!canSubmit}
@@ -275,7 +258,7 @@ export default function AddClientDrawer() {
                         {isSubmitting ? "..." : "Add"}
                       </button>
                     )}
-                  />
+                  </form.Subscribe>
                 </div>
               </form>
             </DialogPanel>

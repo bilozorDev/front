@@ -19,14 +19,9 @@ import {
   ChartPieIcon,
   TvIcon,
 } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import PageHeaderWithAction from "@/components/PageHeaderWithAction";
 import AddProductDrawer from "@/components/AddProductDrawer";
-interface Tab {
-  name: string;
-  searchParam: string;
-  icon: React.ElementType;
-}
 
 function isActiveTab(
   category: ProductCategory,
@@ -41,19 +36,21 @@ function isActiveTab(
   return category.id === currentCategory;
 }
 
-export default function Products() {
+// Create a client component for parts that use useSearchParams
+function ProductsContent() {
   const categorySearchParam = useSearchParams().get("category");
   const params = new URLSearchParams(useSearchParams());
   const router = useRouter();
   const { data: products, error } = useGetProductsByProductCategoryID(
     categorySearchParam ?? "all"
   );
+
   if (error) {
     console.error(error);
   }
-  console.log(products);
+
   return (
-    <div>
+    <>
       <PageHeaderWithAction
         title="Products"
         action={() => {
@@ -62,7 +59,9 @@ export default function Products() {
         }}
         actionText="Add new product"
       />
-      <Tabs />
+
+      <Tabs categorySearchParam={categorySearchParam ?? ""} />
+
       {products?.length === 0 && <div>No products found</div>}
 
       <ul
@@ -76,23 +75,38 @@ export default function Products() {
         ))}
       </ul>
       <AddProductDrawer />
+    </>
+  );
+}
+
+// Main component that wraps the client component with Suspense
+export default function Products() {
+  return (
+    <div>
+      <Suspense fallback={<div>Loading products...</div>}>
+        <ProductsContent />
+      </Suspense>
     </div>
   );
 }
 
-function Tabs() {
+// Updated Tabs component with categorySearchParam as a prop
+function Tabs({ categorySearchParam }: { categorySearchParam: string }) {
   const { data: productCategories, error } = useGetProductCategories();
   const router = useRouter();
-  const categorySearchParam = useSearchParams().get("category");
+
   const handleTabChange = (category: ProductCategory) => {
     router.push(`/dashboard/products?category=${category.id}`);
   };
+
   if (error) {
     console.error(error);
   }
+
   if (productCategories?.length === 0) {
     return "No product categories found";
   }
+
   return (
     <div className="mb-5">
       <div className="grid grid-cols-1 sm:hidden">
@@ -211,7 +225,7 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product }: { product: Product }) {
   const [viewDetails, setViewDetails] = useState(false);
 
   return (

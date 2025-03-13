@@ -1,10 +1,10 @@
 "use client";
 import ClientInfoHeader from "@/components/quotes/ClientHeader";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import AddProduct from "@/components/quotes/AddProduct";
 import useQuoteStore from "@/store/quote-store";
 import { useRouter } from "next/navigation";
-import { createQuote, useCreateQuote } from "@/queries/quotes/client";
+import { useCreateQuote } from "@/queries/quotes/client";
 import { Quote } from "@/types/types.t";
 export default function NewQuote() {
   const [open, setOpen] = useState(false);
@@ -20,7 +20,9 @@ export default function NewQuote() {
     <main className="min-h-screen flex flex-col justify-between ">
       <div className="flex-grow ">
         <header className="relative isolate">
-          <ClientInfoHeader />
+          <Suspense>
+            <ClientInfoHeader />
+          </Suspense>
 
           <div className="flex justify-between items-center mt-4">
             <div>
@@ -154,8 +156,8 @@ const TableFooter = () => {
   );
 };
 
-export function FloatingStatusBar() {
-  const { resetQuote, quoteProducts, clientId, dueDate } = useQuoteStore();
+function FloatingStatusBar() {
+  const { resetQuote, quoteProducts, clientId } = useQuoteStore();
   const { mutate: createQuote, isPending } = useCreateQuote();
   const router = useRouter();
   const handleResetQuote = () => {
@@ -176,6 +178,7 @@ export function FloatingStatusBar() {
     }
 
     createQuote(
+      //@ts-expect-error TODO: fix this
       {},
       {
         onSuccess: (data: Quote) => {

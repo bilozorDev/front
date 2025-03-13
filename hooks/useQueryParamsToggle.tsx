@@ -6,30 +6,38 @@ import { useState, useEffect } from "react";
 
 interface UseQueryParamsToggleProps {
   paramsName: string;
+  defaultValue?: string;
 }
 
 export const useQueryParamsToggle = ({
   paramsName,
+  defaultValue = "true",
 }: UseQueryParamsToggleProps) => {
   const [isActive, setIsActive] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
-  // if param is true, set isActive to true
+  // Set isActive based on search params
   useEffect(() => {
     const paramValue = searchParams.get(paramsName);
-    if (paramValue) {
-      setIsActive(paramValue === "true");
-    }
-  }, [searchParams]);
+    setIsActive(paramValue === defaultValue);
+  }, [searchParams, paramsName, defaultValue]);
 
-  // handle toggle
+  // Handle toggle
   const handleToggle = () => {
-    setIsActive(!isActive);
     const params = new URLSearchParams(searchParams.toString());
-    params.delete(paramsName);
-    router.push(pathname + "?" + params.toString());
+
+    if (isActive) {
+      // If currently active, remove the parameter
+      params.delete(paramsName);
+    } else {
+      // If not active, add the parameter with default value
+      params.set(paramsName, defaultValue);
+    }
+
+    // Update the URL
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   return { isActive, handleToggle };
