@@ -1,5 +1,5 @@
 "use client";
-import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignOutButton, useUser } from "@clerk/nextjs";
 import { ChevronRightIcon, StarIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
 const stats = [
@@ -188,6 +188,12 @@ export default function Home() {
                     >
                       Go to your dashboard
                     </button>
+                    <p className="mt-4 text-center text-gray-500">or</p>
+                    <SignOutButton>
+                      <button className="mx-auto mt-4 flex justify-center rounded-md border border-gray-300 px-5 py-3 text-base font-medium text-gray-900 shadow-sm outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500">
+                        Sign out
+                      </button>
+                    </SignOutButton>
                   </div>
                 </SignedIn>
                 <div className="mt-6">
