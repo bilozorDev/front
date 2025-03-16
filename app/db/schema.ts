@@ -18,6 +18,15 @@ export const products = pgTable("products", {
   name: text("name").notNull(),
   description: text("description"),
   price: numeric("price").notNull(),
+  category_id: uuid("category_id").references(() => productsCategories.id),
+});
+
+export const productsCategories = pgTable("products_categories", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  slug: text("slug").notNull(),
 });
 
 export const quotes = pgTable("quotes", {
@@ -62,5 +71,12 @@ export const quoteItemsRelations = relations(quote_items, ({ one }) => ({
   product: one(products, {
     fields: [quote_items.product_id],
     references: [products.id],
+  }),
+}));
+
+export const productsRelations = relations(products, ({ one }) => ({
+  category: one(productsCategories, {
+    fields: [products.category_id],
+    references: [productsCategories.id],
   }),
 }));

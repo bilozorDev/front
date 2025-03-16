@@ -13,4 +13,5 @@ export default defineConfig({
     url: process.env.DATABASE_URL,
   },
   schema: "./app/db/schema.ts",
+  out: "./app/db/seed.ts",
 });
