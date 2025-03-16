@@ -84,7 +84,6 @@ export default async function ClientPage({
 }) {
   const { id } = await params;
   const data = await getClientById(id);
-  console.log(data[0].name);
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
