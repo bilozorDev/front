@@ -67,6 +67,17 @@ export async function addSampleProducts() {
       };
     }
 
+    // Log available subcategories for debugging
+    console.log(
+      "Available subcategories:",
+      subcategories.map((s) => ({
+        id: s.id,
+        name: s.name,
+        slug: s.slug,
+        category_id: s.category_id,
+      })),
+    );
+
     // Create sample products with variety
     const sampleProducts = [
       // Computer & Laptops category
@@ -109,6 +120,9 @@ export async function addSampleProducts() {
         name: "Wireless Mouse",
         description: "Ergonomic wireless mouse with precision tracking.",
         price: "49.99",
+        cost: "30.00", // Added required cost
+        qty: "5", // Added required qty
+        subcategory_id: getSubcategoryIdBySlug(subcategories, "mice"),
         category_id: getCategoryIdBySlug(categories, "peripherals"),
       },
 
@@ -131,7 +145,7 @@ export async function addSampleProducts() {
         price: "59.99",
         cost: "40.00",
         qty: "10",
-        subcategory_id: getSubcategoryIdBySlug(subcategories, "routers"),
+        subcategory_id: getSubcategoryIdBySlug(subcategories, "switches"),
         category_id: getCategoryIdBySlug(categories, "networking"),
       },
 
@@ -144,7 +158,7 @@ export async function addSampleProducts() {
         price: "149.99",
         cost: "100.00",
         qty: "1",
-        subcategory_id: getSubcategoryIdBySlug(subcategories, "routers"),
+        subcategory_id: getSubcategoryIdBySlug(subcategories, "installation"),
         category_id: getCategoryIdBySlug(categories, "services"),
       },
       {
@@ -155,7 +169,7 @@ export async function addSampleProducts() {
         price: "299.99",
         cost: "200.00",
         qty: "1",
-        subcategory_id: getSubcategoryIdBySlug(subcategories, "routers"),
+        subcategory_id: getSubcategoryIdBySlug(subcategories, "installation"),
         category_id: getCategoryIdBySlug(categories, "services"),
       },
 
@@ -167,7 +181,7 @@ export async function addSampleProducts() {
         price: "39.99",
         cost: "30.00",
         qty: "1",
-        subcategory_id: getSubcategoryIdBySlug(subcategories, "routers"),
+        subcategory_id: getSubcategoryIdBySlug(subcategories, "software"),
         category_id: getCategoryIdBySlug(categories, "other"),
       },
       {
@@ -177,32 +191,114 @@ export async function addSampleProducts() {
         price: "89.99",
         cost: "60.00",
         qty: "1",
-        subcategory_id: getSubcategoryIdBySlug(subcategories, "routers"),
+        subcategory_id: getSubcategoryIdBySlug(
+          subcategories,
+          "storage-solutions",
+        ),
         category_id: getCategoryIdBySlug(categories, "other"),
       },
     ];
 
-    // Filter out any products that don't have a valid category
-    const validProducts = sampleProducts.filter(
-      (product) => product.category_id,
-    );
+    // Before insertion, validate each product has required fields
+    const validProducts = sampleProducts.filter((product) => {
+      console.log(`Validating product: ${product.name}`);
 
-    // Insert the products
-    const insertedProducts = await db
-      .insert(products)
-      .values(validProducts as ProductInsert[])
-      .returning();
+      // Check for valid subcategory
+      if (!product.subcategory_id) {
+        console.log(
+          `WARNING: Product ${product.name} has no valid subcategory. Attempted lookup returned null.`,
+        );
+      }
+
+      // Check required fields
+      const isValid = Boolean(
+        product.category_id &&
+          product.name &&
+          product.price &&
+          product.cost &&
+          product.qty &&
+          product.user_id,
+      );
+
+      if (!isValid) {
+        console.log(
+          `Invalid product: ${product.name} - Missing required fields`,
+        );
+        console.log("Fields:", {
+          category_id: product.category_id,
+          name: product.name,
+          price: product.price,
+          cost: product.cost,
+          qty: product.qty,
+          user_id: product.user_id,
+        });
+      }
+
+      return isValid;
+    });
 
     console.log(
-      `Added ${insertedProducts.length} sample products for user: ${userId}`,
+      `Found ${validProducts.length} valid products out of ${sampleProducts.length}`,
     );
 
-    return {
-      success: "Sample products added successfully",
-      count: insertedProducts.length,
-    };
+    // If no valid products, return error
+    if (validProducts.length === 0) {
+      return {
+        error:
+          "No valid products to insert. Please check server logs for details.",
+      };
+    }
+
+    // Insert the products and handle potential type errors with casting
+    try {
+      const insertedProducts = await db
+        .insert(products)
+        .values(validProducts as ProductInsert[])
+        .returning();
+
+      console.log(
+        `Added ${insertedProducts.length} sample products for user: ${userId}`,
+      );
+
+      return {
+        success: "Sample products added successfully",
+        count: insertedProducts.length,
+      };
+    } catch (insertError) {
+      console.error("Error inserting products:", insertError);
+
+      // Try to insert one by one to identify problematic records
+      const successfulInserts = [];
+      for (const product of validProducts) {
+        try {
+          console.log(`Trying to insert product: ${product.name}`);
+          const result = await db
+            .insert(products)
+            .values(product as ProductInsert)
+            .returning();
+
+          successfulInserts.push(result[0]);
+          console.log(`Successfully inserted: ${product.name}`);
+        } catch (singleInsertError) {
+          console.error(
+            `Failed to insert product ${product.name}:`,
+            singleInsertError,
+          );
+        }
+      }
+
+      if (successfulInserts.length > 0) {
+        return {
+          success: `Partially successful: Added ${successfulInserts.length} out of ${validProducts.length} products`,
+          count: successfulInserts.length,
+        };
+      } else {
+        throw insertError; // Re-throw to handle in the catch block
+      }
+    }
   } catch (error) {
     console.error("Error adding sample products:", error);
+    console.error("Detailed error:", JSON.stringify(error, null, 2));
     return {
       error: "Failed to add sample products. See server logs for details.",
     };
@@ -215,6 +311,13 @@ function getCategoryIdBySlug(
   slug: string,
 ) {
   const category = categories.find((cat) => cat.slug === slug);
+  if (!category) {
+    console.log(`Category not found for slug: ${slug}`);
+    console.log(
+      "Available categories:",
+      categories.map((c) => c.slug),
+    );
+  }
   return category ? category.id : null;
 }
 
@@ -224,5 +327,12 @@ function getSubcategoryIdBySlug(
   slug: string,
 ) {
   const subcategory = subcategories.find((sub) => sub.slug === slug);
+  if (!subcategory) {
+    console.log(`Subcategory not found for slug: ${slug}`);
+    console.log(
+      "Available subcategories:",
+      subcategories.map((s) => s.slug),
+    );
+  }
   return subcategory ? subcategory.id : null;
 }
