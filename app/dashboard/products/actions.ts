@@ -2,6 +2,7 @@
 
 import { db } from "@/app/db";
 import {
+  ProductInsert,
   products,
   productsCategories,
   productSubcategories,
@@ -22,7 +23,10 @@ export async function addProduct(formData: FormData) {
       price: formData.get("price") as string,
       category_id: formData.get("category_id") as string,
       user_id: userId,
-    };
+      cost: formData.get("cost") as string,
+      qty: formData.get("qty") as string,
+      subcategory_id: formData.get("subcategory_id") as string,
+    } as ProductInsert;
 
     // Insert client data
     const result = await db.insert(products).values(productData).returning();
@@ -75,10 +79,7 @@ export async function addSampleProducts() {
         category_id: getCategoryIdBySlug(categories, "computers-and-laptops"),
         cost: "500.00",
         qty: "1",
-        subcategory_id: getSubcategoryIdBySlug(
-          subcategories,
-          "desktop-computers",
-        ),
+        subcategory_id: getSubcategoryIdBySlug(subcategories, "desktops"),
       },
       {
         user_id: userId,
@@ -89,10 +90,7 @@ export async function addSampleProducts() {
         description:
           "14-inch lightweight laptop with extended battery life and business features.",
         category_id: getCategoryIdBySlug(categories, "computers-and-laptops"),
-        subcategory_id: getSubcategoryIdBySlug(
-          subcategories,
-          "business-laptops",
-        ),
+        subcategory_id: getSubcategoryIdBySlug(subcategories, "laptops"),
       },
 
       // Peripherals category
@@ -103,10 +101,7 @@ export async function addSampleProducts() {
         price: "129.99",
         cost: "100.00",
         qty: "1",
-        subcategory_id: getSubcategoryIdBySlug(
-          subcategories,
-          "gaming-keyboards",
-        ),
+        subcategory_id: getSubcategoryIdBySlug(subcategories, "keyboards"),
         category_id: getCategoryIdBySlug(categories, "peripherals"),
       },
       {
@@ -125,10 +120,7 @@ export async function addSampleProducts() {
         price: "189.99",
         cost: "150.00",
         qty: "10",
-        subcategory_id: getSubcategoryIdBySlug(
-          subcategories,
-          "networking-routers",
-        ),
+        subcategory_id: getSubcategoryIdBySlug(subcategories, "routers"),
         category_id: getCategoryIdBySlug(categories, "networking"),
       },
       {
@@ -139,10 +131,7 @@ export async function addSampleProducts() {
         price: "59.99",
         cost: "40.00",
         qty: "10",
-        subcategory_id: getSubcategoryIdBySlug(
-          subcategories,
-          "networking-routers",
-        ),
+        subcategory_id: getSubcategoryIdBySlug(subcategories, "routers"),
         category_id: getCategoryIdBySlug(categories, "networking"),
       },
 
@@ -155,10 +144,7 @@ export async function addSampleProducts() {
         price: "149.99",
         cost: "100.00",
         qty: "1",
-        subcategory_id: getSubcategoryIdBySlug(
-          subcategories,
-          "networking-routers",
-        ),
+        subcategory_id: getSubcategoryIdBySlug(subcategories, "routers"),
         category_id: getCategoryIdBySlug(categories, "services"),
       },
       {
@@ -169,10 +155,7 @@ export async function addSampleProducts() {
         price: "299.99",
         cost: "200.00",
         qty: "1",
-        subcategory_id: getSubcategoryIdBySlug(
-          subcategories,
-          "networking-routers",
-        ),
+        subcategory_id: getSubcategoryIdBySlug(subcategories, "routers"),
         category_id: getCategoryIdBySlug(categories, "services"),
       },
 
@@ -184,10 +167,7 @@ export async function addSampleProducts() {
         price: "39.99",
         cost: "30.00",
         qty: "1",
-        subcategory_id: getSubcategoryIdBySlug(
-          subcategories,
-          "networking-routers",
-        ),
+        subcategory_id: getSubcategoryIdBySlug(subcategories, "routers"),
         category_id: getCategoryIdBySlug(categories, "other"),
       },
       {
@@ -197,10 +177,7 @@ export async function addSampleProducts() {
         price: "89.99",
         cost: "60.00",
         qty: "1",
-        subcategory_id: getSubcategoryIdBySlug(
-          subcategories,
-          "networking-routers",
-        ),
+        subcategory_id: getSubcategoryIdBySlug(subcategories, "routers"),
         category_id: getCategoryIdBySlug(categories, "other"),
       },
     ];
@@ -213,7 +190,7 @@ export async function addSampleProducts() {
     // Insert the products
     const insertedProducts = await db
       .insert(products)
-      .values(validProducts)
+      .values(validProducts as ProductInsert[])
       .returning();
 
     console.log(

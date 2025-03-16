@@ -1,5 +1,14 @@
 import { db } from "@/app/db";
-import { clients, products, productsCategories } from "@/app/db/schema";
+import {
+  Client,
+  clients,
+  Product,
+  ProductCategory,
+  products,
+  productsCategories,
+  productSubcategories,
+  ProductSubcategory,
+} from "@/app/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
 
@@ -13,7 +22,7 @@ export const getClients = async () => {
     .select()
     .from(clients)
     .where(eq(clients.user_id, userId));
-  return clientsList as (typeof clients.$inferSelect)[];
+  return clientsList as Client[];
 };
 
 export const getClientById = async (id: string) => {
@@ -25,7 +34,7 @@ export const getClientById = async (id: string) => {
     .select()
     .from(clients)
     .where(and(eq(clients.id, id), eq(clients.user_id, userId)));
-  return client as (typeof clients.$inferSelect)[];
+  return client as Client[];
 };
 
 /************* Products Queries *************/
@@ -50,7 +59,7 @@ export const getProducts = async () => {
       eq(products.category_id, productsCategories.id),
     )
     .where(eq(products.user_id, userId));
-  return productsList as (typeof products.$inferSelect & {
+  return productsList as (Product & {
     category_name: string | null;
     category_slug: string | null;
   })[];
@@ -59,5 +68,11 @@ export const getProducts = async () => {
 /************* Product Categories Queries *************/
 export const getProductCategories = async () => {
   const productCategoriesList = await db.select().from(productsCategories);
-  return productCategoriesList as (typeof productsCategories.$inferSelect)[];
+  return productCategoriesList as ProductCategory[];
+};
+
+/************* Product Subcategories Queries *************/
+export const getProductSubcategories = async () => {
+  const productSubcategoriesList = await db.select().from(productSubcategories);
+  return productSubcategoriesList as ProductSubcategory[];
 };

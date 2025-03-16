@@ -1,8 +1,8 @@
 "use client";
-import { clients } from "@/app/db/schema";
 import { useTransition } from "react";
 
 import { deleteClient } from "@/app/dashboard/clients/actions";
+import { Client } from "@/app/db/schema";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import {
   EllipsisVerticalIcon,
@@ -11,11 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-export default function ClientCard({
-  client,
-}: {
-  client: typeof clients.$inferSelect;
-}) {
+export default function ClientCard({ client }: { client: Client }) {
   const [, startTransition] = useTransition();
   const router = useRouter();
   const handleDelete = () => {

@@ -1,4 +1,8 @@
-import { relations } from "drizzle-orm";
+import {
+  relations,
+  type InferInsertModel,
+  type InferSelectModel,
+} from "drizzle-orm";
 import { numeric, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const clients = pgTable("clients", {
@@ -11,6 +15,9 @@ export const clients = pgTable("clients", {
   address: text("address"),
 });
 
+export type Client = InferSelectModel<typeof clients>;
+export type ClientInsert = InferInsertModel<typeof clients>;
+
 export const productSubcategories = pgTable("product_subcategories", {
   id: uuid("id").primaryKey().defaultRandom(),
   created_at: timestamp("created_at").defaultNow().notNull(),
@@ -21,6 +28,11 @@ export const productSubcategories = pgTable("product_subcategories", {
     .notNull()
     .references(() => productsCategories.id), // Reference to parent category
 });
+
+export type ProductSubcategory = InferSelectModel<typeof productSubcategories>;
+export type ProductSubcategoryInsert = InferInsertModel<
+  typeof productSubcategories
+>;
 
 export const products = pgTable("products", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -37,6 +49,9 @@ export const products = pgTable("products", {
   ), // Optional subcategory reference
 });
 
+export type Product = InferSelectModel<typeof products>;
+export type ProductInsert = InferInsertModel<typeof products>;
+
 export const productsCategories = pgTable("products_categories", {
   id: uuid("id").primaryKey().defaultRandom(),
   created_at: timestamp("created_at").defaultNow().notNull(),
@@ -44,6 +59,9 @@ export const productsCategories = pgTable("products_categories", {
   description: text("description"),
   slug: text("slug").notNull(),
 });
+
+export type ProductCategory = InferSelectModel<typeof productsCategories>;
+export type ProductCategoryInsert = InferInsertModel<typeof productsCategories>;
 
 export const quotes = pgTable("quotes", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -54,8 +72,10 @@ export const quotes = pgTable("quotes", {
   status: text("status").notNull().default("draft"),
   total_amount: numeric("total_amount").notNull().default("0"),
   notes: text("notes"),
-  // Removed items reference - will be handled through the relationship
 });
+
+export type Quote = InferSelectModel<typeof quotes>;
+export type QuoteInsert = InferInsertModel<typeof quotes>;
 
 export const quote_items = pgTable("quote_items", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -69,6 +89,9 @@ export const quote_items = pgTable("quote_items", {
   total: numeric("total").notNull().default("0"),
   product_id: uuid("product_id").references(() => products.id), // Optional reference to a product
 });
+
+export type QuoteItem = InferSelectModel<typeof quote_items>;
+export type QuoteItemInsert = InferInsertModel<typeof quote_items>;
 
 // Define relations (optional but helps with type safety)
 export const quotesRelations = relations(quotes, ({ many, one }) => ({
@@ -90,6 +113,8 @@ export const quoteItemsRelations = relations(quote_items, ({ one }) => ({
   }),
 }));
 
+
+
 export const productsRelations = relations(products, ({ one }) => ({
   category: one(productsCategories, {
     fields: [products.category_id],
@@ -100,6 +125,7 @@ export const productsRelations = relations(products, ({ one }) => ({
     references: [productSubcategories.id],
   }),
 }));
+
 
 export const productSubcategoriesRelations = relations(
   productSubcategories,

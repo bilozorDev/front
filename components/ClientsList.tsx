@@ -1,5 +1,5 @@
 "use client";
-import { clients as clientsTable } from "@/app/db/schema";
+import { Client } from "@/app/db/schema";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import AddClientDrawer from "./AddClientDrawer";
@@ -9,7 +9,7 @@ import AddSampleClientsButton from "./AddSampleClientsButton";
 const ClientsList = ({
   clients,
 }: {
-  clients: (typeof clientsTable.$inferSelect)[];
+  clients: Client[];
 }) => {
   const [openAddClientModal, setOpenAddClientModal] = useState(false);
   const router = useRouter();
