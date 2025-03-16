@@ -11,14 +11,30 @@ export const clients = pgTable("clients", {
   address: text("address"),
 });
 
+export const productSubcategories = pgTable("product_subcategories", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  slug: text("slug").notNull(),
+  category_id: uuid("category_id")
+    .notNull()
+    .references(() => productsCategories.id), // Reference to parent category
+});
+
 export const products = pgTable("products", {
   id: uuid("id").primaryKey().defaultRandom(),
   user_id: text("user_id").notNull(), // For user ownership
   created_at: timestamp("created_at").defaultNow().notNull(),
   name: text("name").notNull(),
+  cost: numeric("cost").notNull(),
+  qty: numeric("qty").notNull().default("0"),
   description: text("description"),
   price: numeric("price").notNull(),
-  category_id: uuid("category_id").references(() => productsCategories.id),
+  category_id: uuid("category_id").references(() => productsCategories.id), // Main category reference
+  subcategory_id: uuid("subcategory_id").references(
+    () => productSubcategories.id,
+  ), // Optional subcategory reference
 });
 
 export const productsCategories = pgTable("products_categories", {
@@ -79,4 +95,27 @@ export const productsRelations = relations(products, ({ one }) => ({
     fields: [products.category_id],
     references: [productsCategories.id],
   }),
+  subcategory: one(productSubcategories, {
+    fields: [products.subcategory_id],
+    references: [productSubcategories.id],
+  }),
 }));
+
+export const productSubcategoriesRelations = relations(
+  productSubcategories,
+  ({ one, many }) => ({
+    category: one(productsCategories, {
+      fields: [productSubcategories.category_id],
+      references: [productsCategories.id],
+    }),
+    products: many(products),
+  }),
+);
+
+export const productsCategoriesRelations = relations(
+  productsCategories,
+  ({ many }) => ({
+    subcategories: many(productSubcategories),
+    products: many(products),
+  }),
+);

@@ -1,7 +1,11 @@
 "use server";
 
 import { db } from "@/app/db";
-import { products, productsCategories } from "@/app/db/schema";
+import {
+  products,
+  productsCategories,
+  productSubcategories,
+} from "@/app/db/schema";
 import { auth } from "@clerk/nextjs/server";
 
 export async function addProduct(formData: FormData) {
@@ -48,6 +52,10 @@ export async function addSampleProducts() {
 
     // Get all product categories to assign them to products
     const categories = await db.select().from(productsCategories).execute();
+    const subcategories = await db
+      .select()
+      .from(productSubcategories)
+      .execute();
 
     if (categories.length === 0) {
       return {
@@ -65,14 +73,26 @@ export async function addSampleProducts() {
           "Entry-level desktop computer with monitor, keyboard, and mouse.",
         price: "799.99",
         category_id: getCategoryIdBySlug(categories, "computers-and-laptops"),
+        cost: "500.00",
+        qty: "1",
+        subcategory_id: getSubcategoryIdBySlug(
+          subcategories,
+          "desktop-computers",
+        ),
       },
       {
         user_id: userId,
         name: "Business Laptop Pro",
+        cost: "1000.00",
+        qty: "1",
+        price: "1299.99",
         description:
           "14-inch lightweight laptop with extended battery life and business features.",
-        price: "1299.99",
         category_id: getCategoryIdBySlug(categories, "computers-and-laptops"),
+        subcategory_id: getSubcategoryIdBySlug(
+          subcategories,
+          "business-laptops",
+        ),
       },
 
       // Peripherals category
@@ -81,6 +101,12 @@ export async function addSampleProducts() {
         name: "Mechanical Gaming Keyboard",
         description: "RGB backlit mechanical keyboard with customizable keys.",
         price: "129.99",
+        cost: "100.00",
+        qty: "1",
+        subcategory_id: getSubcategoryIdBySlug(
+          subcategories,
+          "gaming-keyboards",
+        ),
         category_id: getCategoryIdBySlug(categories, "peripherals"),
       },
       {
@@ -97,6 +123,12 @@ export async function addSampleProducts() {
         name: "WiFi 6 Router",
         description: "High-speed WiFi 6 router with multi-device support.",
         price: "189.99",
+        cost: "150.00",
+        qty: "10",
+        subcategory_id: getSubcategoryIdBySlug(
+          subcategories,
+          "networking-routers",
+        ),
         category_id: getCategoryIdBySlug(categories, "networking"),
       },
       {
@@ -105,6 +137,12 @@ export async function addSampleProducts() {
         description:
           "8-port gigabit ethernet network switch for home or small office.",
         price: "59.99",
+        cost: "40.00",
+        qty: "10",
+        subcategory_id: getSubcategoryIdBySlug(
+          subcategories,
+          "networking-routers",
+        ),
         category_id: getCategoryIdBySlug(categories, "networking"),
       },
 
@@ -115,6 +153,12 @@ export async function addSampleProducts() {
         description:
           "Professional setup of new computer including software installation and data transfer.",
         price: "149.99",
+        cost: "100.00",
+        qty: "1",
+        subcategory_id: getSubcategoryIdBySlug(
+          subcategories,
+          "networking-routers",
+        ),
         category_id: getCategoryIdBySlug(categories, "services"),
       },
       {
@@ -123,6 +167,12 @@ export async function addSampleProducts() {
         description:
           "Complete installation and configuration of home or office network.",
         price: "299.99",
+        cost: "200.00",
+        qty: "1",
+        subcategory_id: getSubcategoryIdBySlug(
+          subcategories,
+          "networking-routers",
+        ),
         category_id: getCategoryIdBySlug(categories, "services"),
       },
 
@@ -132,6 +182,12 @@ export async function addSampleProducts() {
         name: "Anti-Virus Software Subscription",
         description: "1-year subscription to premium anti-virus software.",
         price: "39.99",
+        cost: "30.00",
+        qty: "1",
+        subcategory_id: getSubcategoryIdBySlug(
+          subcategories,
+          "networking-routers",
+        ),
         category_id: getCategoryIdBySlug(categories, "other"),
       },
       {
@@ -139,6 +195,12 @@ export async function addSampleProducts() {
         name: "External Backup Drive",
         description: "2TB external hard drive for data backup and storage.",
         price: "89.99",
+        cost: "60.00",
+        qty: "1",
+        subcategory_id: getSubcategoryIdBySlug(
+          subcategories,
+          "networking-routers",
+        ),
         category_id: getCategoryIdBySlug(categories, "other"),
       },
     ];
@@ -171,7 +233,19 @@ export async function addSampleProducts() {
 }
 
 // Helper function to get category ID by slug
-function getCategoryIdBySlug(categories: any[], slug: string) {
+function getCategoryIdBySlug(
+  categories: { slug: string; id: string }[],
+  slug: string,
+) {
   const category = categories.find((cat) => cat.slug === slug);
   return category ? category.id : null;
+}
+
+// Helper function to get subcategory ID by slug
+function getSubcategoryIdBySlug(
+  subcategories: { slug: string; id: string }[],
+  slug: string,
+) {
+  const subcategory = subcategories.find((sub) => sub.slug === slug);
+  return subcategory ? subcategory.id : null;
 }
