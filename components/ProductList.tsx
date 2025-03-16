@@ -53,6 +53,7 @@ const ProductsList = ({
         openAddProductDrawer={openAddProductModal}
         setOpenAddProductDrawer={setOpenAddProductModal}
         onProductAdded={handleProductAdded}
+        productCategories={productCategories}
       />
       <div className="mt-4">
         {isPending ? (

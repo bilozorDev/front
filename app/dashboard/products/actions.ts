@@ -4,6 +4,40 @@ import { db } from "@/app/db";
 import { products, productsCategories } from "@/app/db/schema";
 import { auth } from "@clerk/nextjs/server";
 
+export async function addProduct(formData: FormData) {
+  try {
+    // Auth check
+    const { userId } = await auth();
+    if (!userId) {
+      return { error: "User not authenticated" };
+    }
+
+    const productData = {
+      name: formData.get("name") as string,
+      description: formData.get("description") as string,
+      price: formData.get("price") as string,
+      category_id: formData.get("category_id") as string,
+      user_id: userId,
+    };
+
+    // Insert client data
+    const result = await db.insert(products).values(productData).returning();
+
+    return {
+      success: "Product added successfully",
+      data: result[0],
+    };
+  } catch (error: unknown) {
+    console.error("Error in addProduct:", error);
+
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+    }
+
+    return { error: "Failed to add product. Check server logs for details." };
+  }
+}
+
 export async function addSampleProducts() {
   try {
     // Get the current user ID from Clerk
