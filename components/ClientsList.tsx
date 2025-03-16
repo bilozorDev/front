@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import AddClientDrawer from "./AddClientDrawer";
 import ClientCard from "./ClientCard";
 import PageHeaderWithAction from "./PageHeaderWithAction";
+import AddSampleClientsButton from "./AddSampleClientsButton";
 const ClientsList = ({
   clients,
 }: {
@@ -42,7 +43,9 @@ const ClientsList = ({
         {isPending ? (
           <div className="text-gray-500">Refreshing...</div>
         ) : clients.length === 0 ? (
-          <div>No clients found</div>
+          <div>No clients found
+            <AddSampleClientsButton />
+          </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {clients.map((client) => (

@@ -24,7 +24,7 @@ export const db = drizzle(sql, {
     quote_items,
     products,
     quotesRelations,
-    
+
     quoteItemsRelations,
   },
 });
