@@ -2,10 +2,8 @@
 
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { getClientByEmail, useCreateClient } from "@/queries/clients/queries";
-import { useQueryParamsToggle } from "@/hooks/useQueryParamsToggle";
-import { z } from "zod";
 import { AnyFieldApi, useForm } from "@tanstack/react-form";
+import { z } from "zod";
 
 const personSchema = z.object({
   name: z.string().min(1),
@@ -25,12 +23,13 @@ function FieldInfo({ field }: { field: AnyFieldApi }) {
   );
 }
 
-export default function AddClientDrawer() {
-  const { isActive, handleToggle } = useQueryParamsToggle({
-    paramsName: "addClient",
-  });
-  const { mutate: createClient } = useCreateClient();
-
+export default function AddClientDrawer({
+  openAddClientDrawer,
+  setOpenAddClientDrawer,
+}: {
+  openAddClientDrawer: boolean;
+  setOpenAddClientDrawer: (open: boolean) => void;
+}) {
   const form = useForm({
     defaultValues: {
       name: "",
@@ -42,24 +41,18 @@ export default function AddClientDrawer() {
       onChange: personSchema,
     },
 
-    onSubmit: async ({ value }) => {
-      createClient(value, {
-        onSuccess: () => {
-          handleToggle();
-          form.reset();
-        },
-        onError: (error) => {
-          console.error(error);
-        },
-      });
-    },
+    onSubmit: console.log,
   });
   const handleClose = () => {
-    handleToggle();
+    setOpenAddClientDrawer(false);
   };
 
   return (
-    <Dialog open={isActive} onClose={handleClose} className="relative z-50">
+    <Dialog
+      open={openAddClientDrawer}
+      onClose={handleClose}
+      className="relative z-50"
+    >
       <div className="fixed inset-0" />
       <div className="fixed inset-0 overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">
@@ -137,9 +130,8 @@ export default function AddClientDrawer() {
                                   .string()
                                   .email()
                                   .refine(async (value) => {
-                                    const client = await getClientByEmail(
-                                      value
-                                    );
+                                    const client =
+                                      await getClientByEmail(value);
                                     if (client.data) {
                                       return `Email ${value} already exists`;
                                     }

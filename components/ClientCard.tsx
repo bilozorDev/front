@@ -1,10 +1,14 @@
-import { Client } from "@/types/types.t";
+import { clients } from "@/app/db/schema";
 import {
   InformationCircleIcon,
   PlusCircleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
-export default function ClientCard({ client }: { client: Client }) {
+export default function ClientCard({
+  client,
+}: {
+  client: typeof clients.$inferSelect;
+}) {
   return (
     <div
       key={client.email}
