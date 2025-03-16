@@ -1,14 +1,36 @@
+"use client";
 import { clients } from "@/app/db/schema";
+import { useTransition } from "react";
+
+import { deleteClient } from "@/app/dashboard/clients/actions";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import {
+  EllipsisVerticalIcon,
   InformationCircleIcon,
   PlusCircleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 export default function ClientCard({
   client,
 }: {
   client: typeof clients.$inferSelect;
 }) {
+  const [, startTransition] = useTransition();
+  const router = useRouter();
+  const handleDelete = () => {
+    if (window.confirm(`Are you sure you want to delete ${client.name}?`)) {
+      startTransition(async () => {
+        const result = await deleteClient(client.id);
+
+        if (result?.error) {
+          alert(result.error);
+        } else {
+          router.refresh();
+        }
+      });
+    }
+  };
   return (
     <div
       key={client.email}
@@ -16,7 +38,7 @@ export default function ClientCard({
     >
       <div className="flex w-full items-center justify-between space-x-6 p-6">
         <img
-          alt=""
+          alt={client.name}
           src={
             client.name
               ? `https://placehold.co/400x400?text=${client.name?.[0].toUpperCase()}`
@@ -34,6 +56,33 @@ export default function ClientCard({
             {client.address}
           </p>
         </div>
+        <Menu as="div" className="relative ml-auto">
+          <MenuButton className="-m-2.5 block p-2.5 text-gray-400 hover:text-gray-500">
+            <span className="sr-only">Open options</span>
+            <EllipsisVerticalIcon aria-hidden="true" className="size-5" />
+          </MenuButton>
+          <MenuItems
+            transition
+            className="absolute left-[50%] z-10 mt-0.5 w-32 origin-top-right rounded-md bg-white py-2 shadow-lg ring-1 ring-gray-900/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+          >
+            <MenuItem>
+              <button
+                className="block px-3 py-1 text-sm/6 text-gray-900 data-[focus]:bg-gray-50 data-[focus]:outline-none"
+                onClick={handleDelete}
+              >
+                Delete<span className="sr-only">, {client.name}</span>
+              </button>
+            </MenuItem>
+            {/* <MenuItem>
+              <a
+                href="#"
+                className="block px-3 py-1 text-sm/6 text-gray-900 data-[focus]:bg-gray-50 data-[focus]:outline-none"
+              >
+                Edit<span className="sr-only">, {client.name}</span>
+              </a>
+            </MenuItem> */}
+          </MenuItems>
+        </Menu>
       </div>
       <div>
         <div className="-mt-px flex divide-x divide-gray-200">

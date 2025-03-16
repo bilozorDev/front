@@ -2,6 +2,7 @@
 import { db } from "@/app/db";
 import { clients } from "@/app/db/schema";
 import { auth } from "@clerk/nextjs/server";
+import { eq } from "drizzle-orm";
 
 export async function addClient(formData: FormData) {
   try {
@@ -34,5 +35,19 @@ export async function addClient(formData: FormData) {
     }
 
     return { error: "Failed to add client. Check server logs for details." };
+  }
+}
+
+export async function deleteClient(id: string) {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return { error: "User not authenticated" };
+    }
+
+    await db.delete(clients).where(eq(clients.id, id));
+  } catch (error: unknown) {
+    console.error("Error in deleteClient:", error);
+    return { error: "Failed to delete client. Check server logs for details." };
   }
 }
