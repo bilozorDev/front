@@ -4,6 +4,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 import {
   clients,
   products,
+  productsCategories,
   quote_items,
   quoteItemsRelations,
   quotes,
@@ -24,7 +25,7 @@ export const db = drizzle(sql, {
     quote_items,
     products,
     quotesRelations,
-
+    productsCategories,
     quoteItemsRelations,
   },
 });
