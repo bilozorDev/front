@@ -2,7 +2,7 @@
 import { productsCategories, products as productsTable } from "@/app/db/schema";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import AddProductDrawer from "./AddProductDrawer";
 import AddSampleProductsButton from "./AddSampleProductsButton";
 import PageHeaderWithAction from "./PageHeaderWithAction";
@@ -11,13 +11,15 @@ const ProductsList = ({
   products,
   productCategories,
 }: {
-  products: (typeof productsTable.$inferSelect)[];
+  products: (typeof productsTable.$inferSelect & {
+    category_slug: string | null;
+  })[];
   productCategories: (typeof productsCategories.$inferSelect)[];
 }) => {
   const [openAddProductModal, setOpenAddProductModal] = useState(false);
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-
+  const currentCategory = useSearchParams().get("category");
   // Function to refresh data by triggering a router refresh
   const refreshData = () => {
     startTransition(() => {
@@ -30,6 +32,15 @@ const ProductsList = ({
     setOpenAddProductModal(false);
     refreshData();
   };
+
+  const filteredProducts = useMemo(() => {
+    if (currentCategory === "all" || !currentCategory) {
+      return products;
+    }
+    return products.filter(
+      (product) => product.category_slug === currentCategory,
+    );
+  }, [products, currentCategory]);
   return (
     <div>
       <PageHeaderWithAction
@@ -46,21 +57,19 @@ const ProductsList = ({
       <div className="mt-4">
         {isPending ? (
           <div className="text-gray-500">Refreshing...</div>
-        ) : products.length === 0 ? (
+        ) : filteredProducts.length === 0 ? (
           <div>
             No products found
             <AddSampleProductsButton />
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {products.map((product) => (
-              <>
-                <div>
-                  <h2>{product.name}</h2>
-                  <p>{product.description}</p>
-                  <p>{product.price}</p>
-                </div>
-              </>
+            {filteredProducts.map((product) => (
+              <div key={product.id}>
+                <h2>{product.name}</h2>
+                <p>{product.description}</p>
+                <p>{product.price}</p>
+              </div>
             ))}
           </div>
         )}
