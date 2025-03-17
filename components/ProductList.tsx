@@ -1,5 +1,5 @@
 "use client";
-import { productsCategories, products as productsTable } from "@/app/db/schema";
+import { ProductCategory, productsCategories, products as productsTable, ProductSubcategory } from "@/app/db/schema";
 import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
@@ -10,11 +10,13 @@ import PageHeaderWithAction from "./PageHeaderWithAction";
 const ProductsList = ({
   products,
   productCategories,
+  productSubcategories,
 }: {
   products: (typeof productsTable.$inferSelect & {
     category_slug: string | null;
   })[];
-  productCategories: (typeof productsCategories.$inferSelect)[];
+  productCategories: ProductCategory[];
+  productSubcategories: ProductSubcategory[];
 }) => {
   const [openAddProductModal, setOpenAddProductModal] = useState(false);
   const router = useRouter();
@@ -54,6 +56,7 @@ const ProductsList = ({
         setOpenAddProductDrawer={setOpenAddProductModal}
         onProductAdded={handleProductAdded}
         productCategories={productCategories}
+        productSubcategories={productSubcategories}
       />
       <div className="mt-4">
         {isPending ? (

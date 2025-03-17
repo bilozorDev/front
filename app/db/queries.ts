@@ -73,6 +73,20 @@ export const getProductCategories = async () => {
 
 /************* Product Subcategories Queries *************/
 export const getProductSubcategories = async () => {
-  const productSubcategoriesList = await db.select().from(productSubcategories);
-  return productSubcategoriesList as ProductSubcategory[];
+  const productSubcategoriesList = await db
+    .select({
+      id: productSubcategories.id,
+      name: productSubcategories.name,
+      slug: productSubcategories.slug,
+      category_id: productSubcategories.category_id,
+      category_name: productsCategories.name,
+    })
+    .from(productSubcategories)
+    .leftJoin(
+      productsCategories,
+      eq(productSubcategories.category_id, productsCategories.id),
+    );
+  return productSubcategoriesList as (ProductSubcategory & {
+    category_name: string | null;
+  })[];
 };

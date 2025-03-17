@@ -1,31 +1,36 @@
 "use client";
 
 import { addProduct } from "@/app/dashboard/products/actions";
-import { productsCategories } from "@/app/db/schema";
+import { Product, ProductCategory, ProductSubcategory } from "@/app/db/schema";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 
 const initialFormState = {
   name: "",
   description: "",
   price: "",
   category_id: "",
-};
+  cost: "",
+  qty: "",
+  subcategory_id: "",
+} as Product;
 
 export default function AddProductDrawer({
   openAddProductDrawer,
   setOpenAddProductDrawer,
   onProductAdded,
   productCategories,
+  productSubcategories,
 }: {
   openAddProductDrawer: boolean;
   setOpenAddProductDrawer: (open: boolean) => void;
   onProductAdded: () => void;
-  productCategories: (typeof productsCategories.$inferSelect)[];
+  productCategories: ProductCategory[];
+  productSubcategories: ProductSubcategory[];
 }) {
   const [isPending, startTransition] = useTransition();
-
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -42,6 +47,9 @@ export default function AddProductDrawer({
       });
     });
   }
+  const filteredSubcategories = productSubcategories.filter(
+    (subcategory) => subcategory.category_id === selectedCategory,
+  );
   return (
     <Dialog
       open={openAddProductDrawer}
@@ -116,8 +124,24 @@ export default function AddProductDrawer({
                               Description
                             </label>
                             <textarea
-                              defaultValue={initialFormState.description}
+                              defaultValue={initialFormState.description || ""}
                               name="description"
+                              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="product-cost"
+                            className="block text-sm/6 font-medium text-gray-900"
+                          >
+                            Cost
+                          </label>
+                          <div className="mt-2">
+                            <input
+                              defaultValue={initialFormState.cost}
+                              name="cost"
+                              type="number"
                               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                             />
                           </div>
@@ -140,6 +164,22 @@ export default function AddProductDrawer({
                         </div>
                         <div>
                           <label
+                            htmlFor="product-qty"
+                            className="block text-sm/6 font-medium text-gray-900"
+                          >
+                            Quantity
+                          </label>
+                          <div className="mt-2">
+                            <input
+                              defaultValue={initialFormState.qty}
+                              name="qty"
+                              type="number"
+                              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label
                             htmlFor="product-category"
                             className="block text-sm/6 font-medium text-gray-900"
                           >
@@ -148,6 +188,9 @@ export default function AddProductDrawer({
                           <div className="mt-2">
                             <select
                               name="category_id"
+                              onChange={(e) =>
+                                setSelectedCategory(e.target.value)
+                              }
                               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                             >
                               <option value="">Select a category</option>
@@ -171,17 +214,23 @@ export default function AddProductDrawer({
                               name="subcategory_id"
                               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                             >
-                              <option value="">Select a subcategory</option>
-                              {productCategories.map((category) => (
-                                <option key={category.id} value={category.id}>
-                                  {category.name}
+                              <option value="">
+                                {selectedCategory
+                                  ? "Select a subcategory"
+                                  : "Select a category first"}{" "}
+                              </option>
+                              {filteredSubcategories.map((subcategory) => (
+                                <option
+                                  key={subcategory.id}
+                                  value={subcategory.id}
+                                >
+                                  {subcategory.name}
                                 </option>
                               ))}
                             </select>
                           </div>
                         </div>
                       </div>
-                      
                     </div>
                   </div>
                 </div>
