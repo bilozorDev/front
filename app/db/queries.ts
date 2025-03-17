@@ -8,6 +8,8 @@ import {
   productsCategories,
   productSubcategories,
   ProductSubcategory,
+  Quote,
+  quotes,
 } from "@/app/db/schema";
 import { auth } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
@@ -88,5 +90,32 @@ export const getProductSubcategories = async () => {
     );
   return productSubcategoriesList as (ProductSubcategory & {
     category_name: string | null;
+  })[];
+};
+
+/************* Quotes Queries *************/
+export const getQuotes = async () => {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+  const quotesList = await db
+    .select({
+      id: quotes.id,
+      client_id: quotes.client_id,
+      client_name: clients.name,
+      created_at: quotes.created_at,
+      status: quotes.status,
+      total_amount: quotes.total_amount,
+      notes: quotes.notes,
+    })
+    .from(quotes)
+    .leftJoin(clients, eq(quotes.client_id, clients.id))
+    .where(eq(quotes.user_id, userId));
+  return quotesList as (Quote & {
+    client_name: string | null;
+    status: string | null;
+    total_amount: number | null;
+    notes: string | null;
   })[];
 };
