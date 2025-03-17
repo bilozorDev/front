@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useUser } from "@clerk/nextjs";
 import {
   Dialog,
   DialogBackdrop,
@@ -12,6 +12,10 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import {
+  ChevronDownIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/20/solid";
+import {
   Bars3Icon,
   BellIcon,
   ChartPieIcon,
@@ -22,13 +26,8 @@ import {
   UsersIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import {
-  ChevronDownIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/20/solid";
 import { usePathname, useRouter } from "next/navigation";
-import { signOut, getUser } from "@/app/account/login/actions";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
@@ -65,10 +64,6 @@ const teams = [
   { id: 2, name: "Tailwind Labs", href: "#", initial: "T", current: false },
   { id: 3, name: "Workcation", href: "#", initial: "W", current: false },
 ];
-const userNavigation = [
-  { name: "Your profile", href: "/account/" },
-  { name: "Sign out", href: "/account/logout", action: signOut },
-];
 
 const isActive = (pathname: string, href: string): boolean => {
   // Special case for dashboard home
@@ -85,10 +80,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const { data: user } = useQuery({
-    queryKey: ["user"],
-    queryFn: getUser,
-  });
+  const { user } = useUser();
   return (
     <div className="relative">
       <div>
@@ -143,7 +135,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 isActive(pathname, item.href)
                                   ? "bg-gray-50 text-indigo-600"
                                   : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
-                                "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
+                                "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold",
                               )}
                             >
                               <item.icon
@@ -152,7 +144,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                   isActive(pathname, item.href)
                                     ? "text-indigo-600"
                                     : "text-gray-400 group-hover:text-indigo-600",
-                                  "size-6 shrink-0"
+                                  "size-6 shrink-0",
                                 )}
                               />
                               {item.name}
@@ -174,7 +166,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 isActive(pathname, team.href)
                                   ? "bg-gray-50 text-indigo-600"
                                   : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
-                                "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
+                                "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold",
                               )}
                             >
                               <span
@@ -182,7 +174,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                   isActive(pathname, team.href)
                                     ? "border-indigo-600 text-indigo-600"
                                     : "border-gray-200 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600",
-                                  "flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium"
+                                  "flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium",
                                 )}
                               >
                                 {team.initial}
@@ -236,7 +228,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             isActive(pathname, item.href)
                               ? "bg-gray-50 text-indigo-600"
                               : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
-                            "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
+                            "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold",
                           )}
                         >
                           <item.icon
@@ -245,7 +237,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                               isActive(pathname, item.href)
                                 ? "text-indigo-600"
                                 : "text-gray-400 group-hover:text-indigo-600",
-                              "size-6 shrink-0"
+                              "size-6 shrink-0",
                             )}
                           />
                           {item.name}
@@ -267,7 +259,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             team.href.includes(pathname)
                               ? "bg-gray-50 text-indigo-600"
                               : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600",
-                            "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
+                            "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold",
                           )}
                         >
                           <span
@@ -275,7 +267,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                               team.href.includes(pathname)
                                 ? "border-indigo-600 text-indigo-600"
                                 : "border-gray-200 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600",
-                              "flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium"
+                              "flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium",
                             )}
                           >
                             {team.initial}
@@ -363,7 +355,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         aria-hidden="true"
                         className="ml-4 text-sm/6 font-semibold text-gray-900"
                       >
-                        {user?.email}
+                        {user?.emailAddresses[0].emailAddress}
                       </span>
                       <ChevronDownIcon
                         aria-hidden="true"
@@ -376,22 +368,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     transition
                     className="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white py-2 ring-1 shadow-lg ring-gray-900/5 transition focus:outline-hidden data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
                   >
-                    {userNavigation.map((item) => (
-                      <MenuItem key={item.name}>
+                   
+                      <MenuItem >
                         <button
                           className="block px-3 py-1 text-sm/6 text-gray-900 data-focus:bg-gray-50 data-focus:outline-hidden hover:underline"
                           onClick={() => {
-                            if (item.action) {
-                              item.action();
-                            } else {
-                              router.push(item.href);
-                            }
+                            router.push("/user-profile");
                           }}
                         >
-                          {item.name}
+                          Your profile
                         </button>
                       </MenuItem>
-                    ))}
+                   
                   </MenuItems>
                 </Menu>
               </div>

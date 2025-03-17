@@ -1,37 +1,16 @@
-"use client";
-import ClientInfoHeader from "@/components/quotes/ClientHeader";
-import { Suspense, useState } from "react";
-import AddProduct from "@/components/quotes/AddProduct";
-import useQuoteStore from "@/store/quote-store";
-import { useRouter } from "next/navigation";
-import { useCreateQuote } from "@/queries/quotes/client";
-import { Quote } from "@/types/types.t";
-export default function NewQuote() {
-  const [open, setOpen] = useState(false);
 
-  const { quoteProducts, updateQty, removeProduct, dueDate, updateDueDate } =
-    useQuoteStore();
-  const sevenDaysFromNow = new Date(
-    new Date().setDate(new Date().getDate() + 7)
-  )
-    .toISOString()
-    .split("T")[0];
+export default function NewQuote() {
   return (
     <main className="min-h-screen flex flex-col justify-between ">
       <div className="flex-grow ">
         <header className="relative isolate">
-          <Suspense>
-            <ClientInfoHeader />
-          </Suspense>
 
           <div className="flex justify-between items-center mt-4">
             <div>
               <span className="text-gray-500">Due Date: </span>
               <input
                 type="date"
-                value={dueDate || sevenDaysFromNow}
                 className="border border-gray-300 rounded-md p-1"
-                onChange={(e) => updateDueDate(e.target.value)}
                 min={new Date().toISOString().split("T")[0]}
                 max={
                   new Date(new Date().setMonth(new Date().getMonth() + 2))
@@ -77,7 +56,7 @@ export default function NewQuote() {
             </tr>
           </thead>
           <tbody>
-            {quoteProducts.map((item) => (
+            {/* {quoteProducts.map((item) => (
               <tr key={item.id} className="border-b border-gray-100">
                 <td className="max-w-0 px-0 py-5 align-top">
                   <div className="truncate font-medium text-gray-900">
@@ -110,13 +89,10 @@ export default function NewQuote() {
                   ).toFixed(2)}
                 </td>
               </tr>
-            ))}
+            ))} */}
             <tr className="w-full">
               <td className="py-5 flex justify-start items-center   pr-0 text-right align-top tabular-nums text-gray-700">
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                  onClick={() => setOpen(true)}
-                >
+                <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
                   Add Product
                 </button>
               </td>
@@ -124,17 +100,13 @@ export default function NewQuote() {
           </tbody>
           <TableFooter />
         </table>
-        <AddProduct open={open} setOpen={setOpen} />
+        {/* <AddProduct open={open} setOpen={setOpen} /> */}
       </div>
       <FloatingStatusBar />
     </main>
   );
 }
 const TableFooter = () => {
-  const { quoteProducts } = useQuoteStore();
-  const total = quoteProducts.reduce((acc, item) => {
-    return acc + (item.price_to_client || 0) * (item.qty || 0);
-  }, 0);
   return (
     <tfoot>
       <tr>
@@ -149,7 +121,7 @@ const TableFooter = () => {
           Total
         </th>
         <td className="pb-0 pl-8 pr-0 pt-4 text-right font-semibold tabular-nums text-gray-900">
-          $ {total.toFixed(2)}
+          {/* $ {total.toFixed(2)} */}
         </td>
       </tr>
     </tfoot>
@@ -157,50 +129,13 @@ const TableFooter = () => {
 };
 
 function FloatingStatusBar() {
-  const { resetQuote, quoteProducts, clientId } = useQuoteStore();
-  const { mutate: createQuote, isPending } = useCreateQuote();
-  const router = useRouter();
-  const handleResetQuote = () => {
-    resetQuote();
-    router.replace("/dashboard/quotes/new");
-  };
-  const handleSave = () => {
-    console.log("save");
-  };
-  const handleReviewAndSend = () => {
-    if (!clientId) {
-      alert("Please select a client");
-      return;
-    }
-    if (quoteProducts.length === 0) {
-      alert("Please add at least one product");
-      return;
-    }
-
-    createQuote(
-      //@ts-expect-error TODO: fix this
-      {},
-      {
-        onSuccess: (data: Quote) => {
-          // Do anything else with the data here
-          console.log("Quote created:", data.id);
-
-          // Then navigate
-          router.push(`/dashboard/quotes/${data.id}`);
-        },
-      }
-    );
-  };
   return (
     <div className="sticky bottom-5 w-full pb-2 sm:pb-5 z-50  ">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="rounded-lg bg-indigo-500 p-2 shadow-lg sm:p-3">
           <div className="flex items-center justify-between">
             <div>
-              <button
-                className="bg-red-500 text-white px-4 py-2 rounded-md"
-                onClick={handleResetQuote}
-              >
+              <button className="bg-red-500 text-white px-4 py-2 rounded-md">
                 Reset Quote
               </button>
             </div>
@@ -209,18 +144,11 @@ function FloatingStatusBar() {
               {/* <span className="text-gray-300 ml-2">Saved as draft</span> */}
             </p>
             <div className="flex ml-autoflex-row gap-2 items-center">
-              <button
-                onClick={handleSave}
-                className="flex items-center justify-center rounded-md border border-transparent bg-gray-300 px-3 py-2 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-50"
-              >
+              <button className="flex items-center justify-center rounded-md border border-transparent bg-gray-300 px-3 py-2 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-50">
                 Save as draft
               </button>
-              <button
-                onClick={handleReviewAndSend}
-                disabled={isPending}
-                className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-3 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-50"
-              >
-                {isPending ? "Saving..." : "Review and Send"}
+              <button className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-3 text-sm font-medium text-indigo-600 shadow-sm hover:bg-indigo-50">
+                Review and Send
               </button>
             </div>
           </div>

@@ -1,20 +1,20 @@
+import { ChevronDownIcon } from "@heroicons/react/16/solid";
 import {
   ChevronRightIcon,
   MapPinIcon,
   PencilIcon,
   PhoneIcon,
 } from "@heroicons/react/20/solid";
-import Link from "next/link";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
-import { ChevronDownIcon } from "@heroicons/react/16/solid";
+import Link from "next/link";
 
-import { Fragment } from "react";
+import { getClientById } from "@/queries/clients/queries";
 import {
   ArrowDownCircleIcon,
   ArrowPathIcon,
   ArrowUpCircleIcon,
 } from "@heroicons/react/20/solid";
-import { getClientByIdServer } from "@/queries/clients/queries";
+import { Fragment, Suspense } from "react";
 const statuses = {
   Paid: "text-green-700 bg-green-50 ring-green-600/20",
   Withdraw: "text-gray-600 bg-gray-50 ring-gray-500/10",
@@ -83,86 +83,87 @@ export default async function ClientPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { data } = await getClientByIdServer(id);
-  console.log(data.name);
+  const data = await getClientById(id);
   return (
     <>
-      <div className="lg:flex lg:items-center lg:justify-between">
-        <div className="min-w-0 flex-1">
-          <nav aria-label="Breadcrumb" className="flex">
-            <ol role="list" className="flex items-center space-x-4">
-              <li>
-                <div className="flex">
-                  <Link
-                    href="/dashboard/clients"
-                    className="text-sm font-medium text-gray-500 hover:text-gray-700"
-                  >
-                    Clients
-                  </Link>
-                </div>
-              </li>
-              <li>
-                <div className="flex items-center">
-                  <ChevronRightIcon
-                    aria-hidden="true"
-                    className="size-5 shrink-0 text-gray-400"
-                  />
-                  <a
-                    href="#"
-                    className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
-                  >
-                    {data?.name}
-                  </a>
-                </div>
-              </li>
-            </ol>
-          </nav>
-          <h2 className="mt-2 text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-            {data?.name}
-          </h2>
-          <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-            <div className="mt-2 flex items-center text-sm text-gray-500">
-              <MapPinIcon
-                aria-hidden="true"
-                className="mr-1.5 size-5 shrink-0 text-gray-400"
-              />
-              {data?.address}
-            </div>
-            <div className="mt-2 flex items-center text-sm text-gray-500">
-              <PhoneIcon
-                aria-hidden="true"
-                className="mr-1.5 size-5 shrink-0 text-gray-400"
-              />
-              {data?.phone}
-            </div>
-            <div className="mt-2 flex items-center text-sm text-gray-500">
-              <EnvelopeIcon
-                aria-hidden="true"
-                className="mr-1.5 size-5 shrink-0 text-gray-400"
-              />
-              {data?.email}
+      <Suspense fallback={<div>Loading...</div>}>
+        <div className="lg:flex lg:items-center lg:justify-between">
+          <div className="min-w-0 flex-1">
+            <nav aria-label="Breadcrumb" className="flex">
+              <ol role="list" className="flex items-center space-x-4">
+                <li>
+                  <div className="flex">
+                    <Link
+                      href="/dashboard/clients"
+                      className="text-sm font-medium text-gray-500 hover:text-gray-700"
+                    >
+                      Clients
+                    </Link>
+                  </div>
+                </li>
+                <li>
+                  <div className="flex items-center">
+                    <ChevronRightIcon
+                      aria-hidden="true"
+                      className="size-5 shrink-0 text-gray-400"
+                    />
+                    <a
+                      href="#"
+                      className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
+                    >
+                      {data[0].name}
+                    </a>
+                  </div>
+                </li>
+              </ol>
+            </nav>
+            <h2 className="mt-2 text-2xl/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+              {data[0].name}
+            </h2>
+            <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+              <div className="mt-2 flex items-center text-sm text-gray-500">
+                <MapPinIcon
+                  aria-hidden="true"
+                  className="mr-1.5 size-5 shrink-0 text-gray-400"
+                />
+                {data[0].address}
+              </div>
+              <div className="mt-2 flex items-center text-sm text-gray-500">
+                <PhoneIcon
+                  aria-hidden="true"
+                  className="mr-1.5 size-5 shrink-0 text-gray-400"
+                />
+                {data[0].phone}
+              </div>
+              <div className="mt-2 flex items-center text-sm text-gray-500">
+                <EnvelopeIcon
+                  aria-hidden="true"
+                  className="mr-1.5 size-5 shrink-0 text-gray-400"
+                />
+                {data[0].email}
+              </div>
             </div>
           </div>
+          <div className="mt-5 flex lg:ml-4 lg:mt-0">
+            <span className="hidden sm:block">
+              <button
+                type="button"
+                className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              >
+                <PencilIcon
+                  aria-hidden="true"
+                  className="-ml-0.5 mr-1.5 size-5 text-gray-400"
+                />
+                Edit
+              </button>
+            </span>
+          </div>
         </div>
-        <div className="mt-5 flex lg:ml-4 lg:mt-0">
-          <span className="hidden sm:block">
-            <button
-              type="button"
-              className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-            >
-              <PencilIcon
-                aria-hidden="true"
-                className="-ml-0.5 mr-1.5 size-5 text-gray-400"
-              />
-              Edit
-            </button>
-          </span>
+        <div className="my-10">
+          <Stats />
         </div>
-      </div>
-      <div className="my-10">
-        <Stats />
-      </div>
-      <Activity />
+        <Activity />
+      </Suspense>
     </>
   );
 }
@@ -210,7 +211,7 @@ function Stats() {
                     tab.current
                       ? "border-indigo-500 text-indigo-600"
                       : "border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-700",
-                    "flex whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium capitalize"
+                    "flex whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium capitalize",
                   )}
                 >
                   {tab.name}
@@ -294,7 +295,7 @@ function Activity() {
                                     statuses[
                                       transaction.status as keyof typeof statuses
                                     ],
-                                    "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset"
+                                    "rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
                                   )}
                                 >
                                   {transaction.status}
